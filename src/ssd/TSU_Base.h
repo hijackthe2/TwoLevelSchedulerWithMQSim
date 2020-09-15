@@ -48,6 +48,7 @@ namespace SSD_Components
 		*/
 		virtual void Schedule() = 0;
 		virtual void Report_results_in_XML(std::string name_prefix, Utils::XmlWriter& xmlwriter);
+		NVM_PHY_ONFI_NVDDR2* Get_NVMController() { return _NVMController; }
 	protected:
 		FTL* ftl;
 		NVM_PHY_ONFI_NVDDR2* _NVMController;

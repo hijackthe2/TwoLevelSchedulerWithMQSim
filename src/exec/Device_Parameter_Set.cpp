@@ -260,6 +260,8 @@ void Device_Parameter_Set::XML_serialize(Utils::XmlWriter& xmlwriter)
 	case SSD_Components::Flash_Plane_Allocation_Scheme_Type::WPDC:
 		val = "WPDC";
 		break;
+	case SSD_Components::Flash_Plane_Allocation_Scheme_Type::RBGC:
+		val = "RBGC";
 	default:
 		break;
 	}
@@ -273,6 +275,9 @@ void Device_Parameter_Set::XML_serialize(Utils::XmlWriter& xmlwriter)
 		break;
 	case SSD_Components::Flash_Scheduling_Type::FLIN:
 		val = "FLIN";
+		break;
+	case SSD_Components::Flash_Scheduling_Type::SPEED_LIMIT:
+		val = "SPEED_LIMIT";
 		break;
 	default:
 		break;
@@ -564,6 +569,8 @@ void Device_Parameter_Set::XML_deserialize(rapidxml::xml_node<> *node)
 					Plane_Allocation_Scheme = SSD_Components::Flash_Plane_Allocation_Scheme_Type::WPCD;
 				else if (strcmp(val.c_str(), "WPDC") == 0)
 					Plane_Allocation_Scheme = SSD_Components::Flash_Plane_Allocation_Scheme_Type::WPDC;
+				else if (strcmp(val.c_str(), "RBGC") == 0)
+					Plane_Allocation_Scheme = SSD_Components::Flash_Plane_Allocation_Scheme_Type::RBGC;
 				else PRINT_ERROR("Unknown plane allocation scheme type specified in the SSD configuration file")
 			}
 			else if (strcmp(param->name(), "Transaction_Scheduling_Policy") == 0)
@@ -574,6 +581,8 @@ void Device_Parameter_Set::XML_deserialize(rapidxml::xml_node<> *node)
 					Transaction_Scheduling_Policy = SSD_Components::Flash_Scheduling_Type::OUT_OF_ORDER;
 				else if (strcmp(val.c_str(), "FLIN") == 0)
 					Transaction_Scheduling_Policy = SSD_Components::Flash_Scheduling_Type::FLIN;
+				else if (strcmp(val.c_str(), "SPEED_LIMIT") == 0)
+					Transaction_Scheduling_Policy = SSD_Components::Flash_Scheduling_Type::SPEED_LIMIT;
 				else PRINT_ERROR("Unknown transaction scheduling type specified in the SSD configuration file")
 			}
 			else if (strcmp(param->name(), "Overprovisioning_Ratio") == 0)
