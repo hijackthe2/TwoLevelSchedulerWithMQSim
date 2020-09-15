@@ -169,6 +169,9 @@
     <ClInclude Include="src\utils\Workload_Statistics.h" />
     <ClInclude Include="src\utils\XMLWriter.h" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="README.md" />
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>
     <ProjectGuid>{DF6B928B-78A2-4285-BFF8-8136B4AEDB6A}</ProjectGuid>
