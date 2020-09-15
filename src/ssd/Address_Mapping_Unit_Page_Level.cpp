@@ -288,8 +288,17 @@ namespace SSD_Components
 		flash_channel_ID_type* chip_ids = NULL;
 		flash_channel_ID_type* die_ids = NULL;
 		flash_channel_ID_type* plane_ids = NULL;
+
+		round_robin_address = new NVM::FlashMemory::Physical_Page_Address[no_of_input_streams];
+		round_robin_mapping_address = new NVM::FlashMemory::Physical_Page_Address[no_of_input_streams];
 		for (unsigned int domainID = 0; domainID < no_of_input_streams; domainID++)
 		{
+
+			round_robin_address[domainID].ChannelID = round_robin_mapping_address[domainID].ChannelID = channel_count - 1;
+			round_robin_address[domainID].ChipID = round_robin_mapping_address[domainID].ChipID = chip_no_per_channel - 1;
+			round_robin_address[domainID].DieID = round_robin_mapping_address[domainID].DieID = die_no_per_chip - 1;
+			round_robin_address[domainID].PlaneID = round_robin_mapping_address[domainID].PlaneID = plane_no_per_die - 1;
+
 			/* Since we want to have the same mapping table entry size for all streams, the entry size
 			*  is calculated at this level and then pass it to the constructors of mapping domains
 			* entry size = sizeOf(lpa) + sizeOf(ppn) + sizeOf(bit vector that shows written sectors of a page)
@@ -1748,6 +1757,10 @@ namespace SSD_Components
 	inline bool Address_Mapping_Unit_Page_Level::is_mvpn_locked_for_gc(stream_id_type stream_id, MVPN_type mvpn)
 	{
 		return domains[stream_id]->Locked_MVPNs.find(mvpn) != domains[stream_id]->Locked_MVPNs.end();
+	}
+	void Address_Mapping_Unit_Page_Level::allocate_round_robin_address(NVM::FlashMemory::Physical_Page_Address& rra,
+		NVM::FlashMemory::Physical_Page_Address& target_address)
+	{
 	}
 	inline void Address_Mapping_Unit_Page_Level::Set_barrier_for_accessing_lpa(stream_id_type stream_id, LPA_type lpa)
 	{

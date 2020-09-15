@@ -198,6 +198,11 @@ namespace SSD_Components
 		void manage_mapping_transaction_facing_barrier(stream_id_type stream_id, MVPN_type mvpn, bool read);
 		bool is_lpa_locked_for_gc(stream_id_type stream_id, LPA_type lpa);
 		bool is_mvpn_locked_for_gc(stream_id_type stream_id, MVPN_type mvpn);
+
+		NVM::FlashMemory::Physical_Page_Address* round_robin_address;
+		NVM::FlashMemory::Physical_Page_Address* round_robin_mapping_address;
+		void allocate_round_robin_address(NVM::FlashMemory::Physical_Page_Address& rra,
+			NVM::FlashMemory::Physical_Page_Address& target_address);
 	};
 
 }

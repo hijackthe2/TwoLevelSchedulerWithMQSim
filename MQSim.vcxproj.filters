@@ -211,6 +211,9 @@
     <ClCompile Include="src\host\SATA_HBA.cpp">
       <Filter>host</Filter>
     </ClCompile>
+    <ClCompile Include="src\ssd\TSU_SpeedLimit.cpp">
+      <Filter>ssd</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\exec\Device_Parameter_Set.h">
@@ -470,6 +473,9 @@
     </ClInclude>
     <ClInclude Include="src\host\SATA_HBA.h">
       <Filter>host</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ssd\TSU_SpeedLimit.h">
+      <Filter>ssd</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

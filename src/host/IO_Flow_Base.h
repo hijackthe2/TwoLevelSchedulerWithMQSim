@@ -69,7 +69,8 @@ namespace Host_Components
 		void Report_results_in_XML(std::string name_prefix, Utils::XmlWriter& xmlwriter);
 		virtual void Get_statistics(Utils::Workload_Statistics& stats, LPA_type(*Convert_host_logical_address_to_device_address)(LHA_type lha),
 			page_status_type(*Find_NVM_subunit_access_bitmap)(LHA_type lha)) = 0;
-		bool is_done() { return progress >= 100 && STAT_generated_request_count == STAT_serviced_request_count; }
+		// add function
+		bool is_done() { return progress >= 100 /*&& STAT_generated_request_count == STAT_serviced_request_count*/; }
 	protected:
 		uint16_t flow_id;
 		double initial_occupancy_ratio;//The initial amount of valid logical pages when pereconditioning is performed

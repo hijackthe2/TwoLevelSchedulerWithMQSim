@@ -12,7 +12,7 @@
 
 namespace SSD_Components
 {
-	enum class Flash_Scheduling_Type {OUT_OF_ORDER, FLIN};
+	enum class Flash_Scheduling_Type {OUT_OF_ORDER, FLIN, SPEED_LIMIT};
 	class FTL;
 	class TSU_Base : public MQSimEngine::Sim_Object
 	{
@@ -68,6 +68,7 @@ namespace SSD_Components
 		virtual bool service_read_transaction(NVM::FlashMemory::Flash_Chip* chip) = 0;
 		virtual bool service_write_transaction(NVM::FlashMemory::Flash_Chip* chip) = 0;
 		virtual bool service_erase_transaction(NVM::FlashMemory::Flash_Chip* chip) = 0;
+		// add function
 		virtual void service_transaction(NVM::FlashMemory::Flash_Chip* chip) = 0;
 		static void handle_transaction_serviced_signal_from_PHY(NVM_Transaction_Flash* transaction);
 		static void handle_channel_idle_signal(flash_channel_ID_type);

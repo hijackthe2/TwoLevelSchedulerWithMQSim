@@ -27,6 +27,7 @@ public:
 
 	void Attach_ssd_device(SSD_Device* ssd_device);
 	const std::vector<Host_Components::IO_Flow_Base*> Get_io_flows();
+	// add function
 	void decide_whether_to_stop_engine();
 private:
 	Host_Components::PCIe_Root_Complex* PCIe_root_complex;

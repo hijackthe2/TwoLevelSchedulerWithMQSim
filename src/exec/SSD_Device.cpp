@@ -141,26 +141,38 @@ SSD_Device::SSD_Device(Device_Parameter_Set* parameters, std::vector<IO_Flow_Par
 				parameters->Preferred_suspend_write_time_for_read, parameters->Preferred_suspend_erase_time_for_read, parameters->Preferred_suspend_erase_time_for_write,
 				erase_suspension, program_suspension);
 			break;
-		/*case SSD_Components::Flash_Scheduling_Type::FLIN:
+		case SSD_Components::Flash_Scheduling_Type::FLIN:
 		{
-			unsigned int * stream_count_per_priority_class = new unsigned int[4];
+			unsigned int* stream_count_per_priority_class = new unsigned int[4];
+			std::list<stream_id_type>* stream_list_per_priority_class = new std::list<stream_id_type>[4];
 			for (int i = 0; i < 4; i++)
 				stream_count_per_priority_class[i] = 0;
-			for (auto &flow : (*io_flows))
-				stream_count_per_priority_class[(int)flow->Priority_Class]++;
-			stream_id_type** stream_ids_per_priority_class = new stream_id_type*[4];
+			for (stream_id_type flow_id = 0; flow_id < io_flows->size(); ++flow_id)
+			{
+				stream_count_per_priority_class[(int)((*io_flows)[flow_id]->Priority_Class) - 1]++;
+				stream_list_per_priority_class[(int)((*io_flows)[flow_id]->Priority_Class) - 1].push_back(flow_id);
+			}
+			stream_id_type** stream_ids_per_priority_class = new stream_id_type * [4];
 			for (int i = 0; i < 4; i++)
+			{
 				stream_ids_per_priority_class[i] = new stream_id_type[stream_count_per_priority_class[i]];
+				for (unsigned int count = 0; count < stream_count_per_priority_class[i]; ++count)
+				{
+					stream_ids_per_priority_class[i][count] = stream_list_per_priority_class[i].front();
+					stream_list_per_priority_class[i].pop_front();
+				}
+			}
+			delete[] stream_list_per_priority_class;
 
 			tsu = new SSD_Components::TSU_FLIN(ftl->ID() + ".TSU", ftl, static_cast<SSD_Components::NVM_PHY_ONFI_NVDDR2*>(device->PHY),
 				parameters->Flash_Channel_Count, parameters->Chip_No_Per_Channel,
 				parameters->Flash_Parameters.Die_No_Per_Chip, parameters->Flash_Parameters.Plane_No_Per_Die, parameters->Flash_Parameters.Page_Capacity,
 				10000000, 33554432, 262144, 4, (unsigned int)io_flows->size(), stream_count_per_priority_class, stream_ids_per_priority_class,
-				0.6,
+				0.6, 1000,
 				parameters->Preferred_suspend_write_time_for_read, parameters->Preferred_suspend_erase_time_for_read, parameters->Preferred_suspend_erase_time_for_write,
 				erase_suspension, program_suspension);
 			break;
-		}*/
+		}
 		default:
 			throw std::invalid_argument("No implementation is available for the specified transaction scheduling algorithm");
 		}

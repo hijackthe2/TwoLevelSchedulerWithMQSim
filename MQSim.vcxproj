@@ -73,6 +73,7 @@
     <ClCompile Include="src\ssd\TSU_Base.cpp" />
     <ClCompile Include="src\ssd\TSU_FLIN.cpp" />
     <ClCompile Include="src\ssd\TSU_OutofOrder.cpp" />
+    <ClCompile Include="src\ssd\TSU_SpeedLimit.cpp" />
     <ClCompile Include="src\ssd\User_Request.cpp" />
     <ClCompile Include="src\utils\CMRRandomGenerator.cpp" />
     <ClCompile Include="src\utils\Helper_Functions.cpp" />
@@ -155,6 +156,7 @@
     <ClInclude Include="src\ssd\TSU_Base.h" />
     <ClInclude Include="src\ssd\TSU_FLIN.h" />
     <ClInclude Include="src\ssd\TSU_OutofOrder.h" />
+    <ClInclude Include="src\ssd\TSU_SpeedLimit.h" />
     <ClInclude Include="src\ssd\User_Request.h" />
     <ClInclude Include="src\utils\CMRRandomGenerator.h" />
     <ClInclude Include="src\utils\DistributionTypes.h" />
