@@ -173,6 +173,9 @@ SSD_Device::SSD_Device(Device_Parameter_Set* parameters, std::vector<IO_Flow_Par
 				erase_suspension, program_suspension);
 			break;
 		}
+		case SSD_Components::Flash_Scheduling_Type::SPEED_LIMIT:
+			tsu = NULL;
+			break;
 		default:
 			throw std::invalid_argument("No implementation is available for the specified transaction scheduling algorithm");
 		}

@@ -377,6 +377,8 @@ namespace SSD_Components
 		for (unsigned int i = 0; i < no_of_input_streams; i++)
 			delete domains[i];
 		delete[] domains;
+		delete[] round_robin_address;
+		delete[] round_robin_mapping_address;
 	}
 	void Address_Mapping_Unit_Page_Level::Setup_triggers()
 	{
