@@ -1,10 +1,11 @@
 # Two-Level Scheduler With MQSim
 - An I/O scheduler for NVMe SSD     
-- Usage for [MQSim](https://github.com/CMU-SAFARI/MQSim)
+- Usage for [MQSim](https://github.com/CMU-SAFARI/MQSim)      
+- implemente TSU scheduler FLIN, based on FLIN paper
 
 ## Added Item
 - TSU schedule policy: **SPEED_LIMIT**, see TSU_SpeedLimit.h and TSU_SpeedLimit.cpp   
-- Plane Allocation Scheme: **RBGC** (**R**ound robin address **B**ypass **__GC__**)
+- Plane Allocation Scheme: **RBGC** (**R**ound robin address **B**ypass **GC**)
 
 ## To Do
 - request size 与 request queue length 成反比的实验     
