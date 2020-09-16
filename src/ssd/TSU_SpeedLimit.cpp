@@ -50,6 +50,7 @@ namespace SSD_Components
 				GCEraseTRQueue[channel_id][chip_id].Set_id("GC_Erase_TR_Queue@" + str);
 
 				transaction_waiting_dispatch_slots[channel_id][chip_id].clear();
+				serviced_writes_since_last_GC[channel_id][chip_id] = new unsigned int[stream_count];
 				for (unsigned int stream_id = 0; stream_id < stream_count; ++stream_id)
 				{
 					serviced_writes_since_last_GC[channel_id][chip_id][stream_id] = 0;
@@ -101,8 +102,9 @@ namespace SSD_Components
 			delete[] transaction_waiting_dispatch_slots[channel_id];
 			for (unsigned int chip_id = 0; chip_id < chip_no_per_channel; ++chip_id)
 			{
-				delete[] serviced_writes_since_last_GC[channel_id];
+				delete[] serviced_writes_since_last_GC[channel_id][chip_id];
 			}
+			delete[] serviced_writes_since_last_GC[channel_id];
 		}
 		delete[] UserReadTRQueue;
 		delete[] UserWriteTRQueue;

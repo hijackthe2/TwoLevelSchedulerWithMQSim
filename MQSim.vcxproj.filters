@@ -481,4 +481,8 @@
   <ItemGroup>
     <None Include="README.md" />
   </ItemGroup>
+  <ItemGroup>
+    <Xml Include="ssdconfig.xml" />
+    <Xml Include="workload.xml" />
+  </ItemGroup>
 </Project>

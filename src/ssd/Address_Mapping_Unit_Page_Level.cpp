@@ -1777,14 +1777,15 @@ namespace SSD_Components
 	void Address_Mapping_Unit_Page_Level::allocate_round_robin_address_bypass_gc(NVM::FlashMemory::Physical_Page_Address& rra,
 		NVM::FlashMemory::Physical_Page_Address& target_address)
 	{
-		if (ftl->TSU->Get_NVMController()->Is_chip_busy_with_gc(rra.ChannelID, rra.ChipID))
+		SSD_Components::NVM_PHY_ONFI_NVDDR2* _NVMController = (SSD_Components::NVM_PHY_ONFI_NVDDR2*)(ftl->PHY);
+		if (_NVMController->Is_chip_busy_with_gc(rra.ChannelID, rra.ChipID))
 		{
 			for (unsigned int chip_cnt = 0; chip_cnt < chip_no_per_channel; ++chip_cnt)
 			{
 				for (unsigned int channel_cnt = 0; channel_cnt < channel_count; ++channel_cnt)
 				{
 					rra.ChannelID = (rra.ChannelID + 1) % channel_count;
-					if (!ftl->TSU->Get_NVMController()->Is_chip_busy_with_gc(rra.ChannelID, rra.ChipID))
+					if (!_NVMController->Is_chip_busy_with_gc(rra.ChannelID, rra.ChipID))
 					{
 						rra.DieID = 0;
 						rra.PlaneID = 0;

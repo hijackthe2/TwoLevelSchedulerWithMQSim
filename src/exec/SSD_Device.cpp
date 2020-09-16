@@ -12,6 +12,7 @@
 #include "../ssd/GC_and_WL_Unit_Page_Level.h"
 #include "../ssd/TSU_OutofOrder.h"
 #include "../ssd/TSU_FLIN.h"
+#include "../ssd/TSU_SpeedLimit.h"
 #include "../ssd/ONFI_Channel_NVDDR2.h"
 #include "../ssd/NVM_PHY_ONFI_NVDDR2.h"
 #include "../utils/Logical_Address_Partitioning_Unit.h"
@@ -174,7 +175,13 @@ SSD_Device::SSD_Device(Device_Parameter_Set* parameters, std::vector<IO_Flow_Par
 			break;
 		}
 		case SSD_Components::Flash_Scheduling_Type::SPEED_LIMIT:
-			tsu = NULL;
+			tsu = new SSD_Components::TSU_SpeedLimit(ftl->ID() + ".TSU", ftl, static_cast<SSD_Components::NVM_PHY_ONFI_NVDDR2*>(device->PHY),
+				parameters->Flash_Channel_Count, parameters->Chip_No_Per_Channel,
+				parameters->Flash_Parameters.Die_No_Per_Chip, parameters->Flash_Parameters.Plane_No_Per_Die,
+				(unsigned int)io_flows->size(), parameters->Preferred_suspend_write_time_for_read,
+				parameters->Preferred_suspend_erase_time_for_read, parameters->Preferred_suspend_erase_time_for_write,
+				erase_suspension, program_suspension);
+			break;
 			break;
 		default:
 			throw std::invalid_argument("No implementation is available for the specified transaction scheduling algorithm");
