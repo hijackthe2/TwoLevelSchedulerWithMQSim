@@ -9,7 +9,7 @@
 
 ## To Do
 - request size 与 request queue length 成反比的实验     
-- hard code 与使用 ml (machine learning) 的实验     
+- hard code 与使用 ml (machine learning) 的实验 (√)     
 - 描绘 plane 状态的功能 (√ see function collect_results in Flash_Chip.h and Flash_Chip.cpp)    
 - read 和 write之间限速的功能
 
@@ -22,5 +22,5 @@
     | # total | 220316 | 220302 | 220311 |
     | runtime | 7min | 8min49s | 17min17s |
 
-    1. hard code 使用 ml 训练集中块内无效页数量的3/4 quatile 210, 即块内无效页数量>210不执行GC
-    2. 从实验中看出，hard code 比 ml 效果好, 并且执行时间短，但比 origianl 的时间长, 但这样的开销可接受
+    1. hard code 使用 ml 训练集中块内无效页数量的3/4 quantile (210), 即块内无效页数量>210不执行GC
+    2. 从实验中看出, hard code 比 ml 效果好, 并且执行时间短, 但比 origianl 的时间长, 但这样的开销可接受
