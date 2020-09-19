@@ -6,6 +6,9 @@
 *.user
 *.userosscache
 *.sln.docstates
+*.exe
+*.iobj
+*.ipdb
 
 # User-specific files (MonoDevelop/Xamarin Studio)
 *.userprefs
@@ -262,3 +265,6 @@ __pycache__/
 
 #output file
 out/
+*.xml
+!ssdconfig.xml
+!workload.xml

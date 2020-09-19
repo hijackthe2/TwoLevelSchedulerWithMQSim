@@ -20,7 +20,7 @@
     | # execution GC  | 42114 | 23990 | 374774 |
     | # non-execution GC | 178202 | 196312 | 220302 |
     | # total | 220316 | 220302 | 220311 |
-    | runtime | 7min | 8min49s | 17min17s |
+    | runtime | 8min44s | 8min49s | 17min17s |
 
     1. hard code 使用 ml 训练集中块内无效页数量的3/4 quantile (210), 即块内无效页数量>210不执行GC
-    2. 从实验中看出, hard code 比 ml 效果好, 并且执行时间短, 但比 origianl 的时间长, 但这样的开销可接受
+    2. 从实验中看出, hard code 比 ml 效果好, 并且执行时间短, 与 origianl 的时间差不多
