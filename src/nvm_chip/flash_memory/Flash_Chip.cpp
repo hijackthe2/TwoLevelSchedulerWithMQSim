@@ -36,6 +36,9 @@ namespace NVM
 			Dies = new Die*[dieNo];
 			for (unsigned int dieID = 0; dieID < dieNo; dieID++)
 				Dies[dieID] = new Die(PlaneNoPerDie, Block_no_per_plane, Page_no_per_block);
+
+			plane_fs.open("plane@" + std::to_string(channelID) + "@" + std::to_string(localChipID) + "out.txt", std::fstream::out);
+			plane_fs << "type\tchannel\t<<chip\tdie\tplane\tstart\tend<<diff" << std::endl;
 		}
 
 		Flash_Chip::~Flash_Chip()
@@ -45,6 +48,7 @@ namespace NVM
 			delete[] Dies;
 			delete[] _readLatency;
 			delete[] _programLatency;
+			plane_fs.close();
 		}
 
 		void Flash_Chip::Connect_to_chip_ready_signal(ChipReadySignalHandlerType function)
@@ -151,6 +155,7 @@ namespace NVM
 					STAT_readCount++;
 					targetDie->Planes[command->Address[planeCntr].PlaneID]->Read_count++;
 					targetDie->Planes[command->Address[planeCntr].PlaneID]->Blocks[command->Address[planeCntr].BlockID]->Pages[command->Address[planeCntr].PageID].Read_metadata(command->Meta_data[planeCntr]);
+					collect_results("read", command->Address[planeCntr], executionStartTime, Simulator->Time());
 				}
 				break;
 			case CMD_PROGRAM_PAGE:
@@ -163,6 +168,7 @@ namespace NVM
 					STAT_progamCount++;
 					targetDie->Planes[command->Address[planeCntr].PlaneID]->Progam_count++;
 					targetDie->Planes[command->Address[planeCntr].PlaneID]->Blocks[command->Address[planeCntr].BlockID]->Pages[command->Address[planeCntr].PageID].Write_metadata(command->Meta_data[planeCntr]);
+					collect_results("write", command->Address[planeCntr], executionStartTime, Simulator->Time());
 				}
 				break;
 			case CMD_ERASE_BLOCK:
@@ -195,6 +201,13 @@ namespace NVM
 			for (std::vector<ChipReadySignalHandlerType>::iterator it = connectedReadyHandlers.begin();
 				it != connectedReadyHandlers.end(); it++)
 				(*it)(this, command);
+		}
+
+		void Flash_Chip::collect_results(const std::string type, const Physical_Page_Address& address, sim_time_type start_time,
+			sim_time_type end_time)
+		{
+			plane_fs << type << "\t" << address.ChannelID << "\t" << address.ChipID << "\t" << address.DieID << "\t"
+				<< address.PlaneID << "\t" << start_time << "\t" << end_time << "\t" << end_time - start_time << std::endl;
 		}
 
 		void Flash_Chip::Suspend(flash_die_ID_type dieID)

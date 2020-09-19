@@ -480,6 +480,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="README.md" />
+    <None Include=".gitignore" />
   </ItemGroup>
   <ItemGroup>
     <Xml Include="ssdconfig.xml" />

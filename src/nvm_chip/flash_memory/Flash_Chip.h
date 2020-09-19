@@ -11,6 +11,7 @@
 #include "Flash_Command.h"
 #include <vector>
 #include <stdexcept>
+#include <fstream>
 
 namespace NVM
 {
@@ -142,6 +143,10 @@ namespace NVM
 			void finish_command_execution(Flash_Command* command);
 			void broadcast_ready_signal(Flash_Command* command);
 			std::vector<ChipReadySignalHandlerType> connectedReadyHandlers;
+
+			std::fstream plane_fs;
+			void collect_results(const std::string type, const Physical_Page_Address& address, sim_time_type start_time,
+				sim_time_type end_time);
 		};
 	}
 }
