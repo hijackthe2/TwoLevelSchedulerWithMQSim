@@ -38,7 +38,7 @@ namespace NVM
 				Dies[dieID] = new Die(PlaneNoPerDie, Block_no_per_plane, Page_no_per_block);
 
 			plane_fs.open("out/plane_out@" + std::to_string(channelID) + "@" + std::to_string(localChipID) + ".txt", std::fstream::out);
-			plane_fs << "type\tchannel\t<<chip\tdie\tplane\tstart\tend\tdiff" << std::endl;
+			plane_fs << "type\tchannel\tchip\tdie\tplane\tstart\tend\tdiff" << std::endl;
 		}
 
 		Flash_Chip::~Flash_Chip()
