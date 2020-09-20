@@ -8,9 +8,9 @@
 - Plane Allocation Scheme: **RBGC** (**R**ound robin address **B**ypass **GC**)
 
 ## To Do
-- request size 与 request queue length 成反比的实验 (√)     
-- hard code 与使用 ml (machine learning) 的实验 (√)     
-- 描绘 plane 状态的功能 (√ see function collect_results in Flash_Chip.h and Flash_Chip.cpp)    
+- request size 与 request queue length 成反比的实验 (**√**)     
+- hard code 与使用 ml (machine learning) 的实验 (**√**)     
+- 描绘 plane 状态的功能 (**√** see function collect_results in Flash_Chip.h and Flash_Chip.cpp)    
 - read 和 write 之间限速的功能
 
 ## Experiment
