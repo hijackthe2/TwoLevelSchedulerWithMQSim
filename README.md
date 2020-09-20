@@ -11,10 +11,10 @@
 - request size 与 request queue length 成反比的实验 (√)     
 - hard code 与使用 ml (machine learning) 的实验 (√)     
 - 描绘 plane 状态的功能 (√ see function collect_results in Flash_Chip.h and Flash_Chip.cpp)    
-- read 和 write之间限速的功能
+- read 和 write 之间限速的功能
 
 ## Experiment
-- hard code VS ml  
+- **hard code VS ml**  
     | | original | hard code | ml |
     | :-:| :-: | :-: | :-: |
     | # execution GC  | 42114 | 23990 | 374774 |
@@ -26,8 +26,8 @@
     1. hard code 使用 ml 训练集中块内无效页数量的3/4 quantile (210), 即块内无效页数量>210不执行GC
     2. hard code 比 ml 效果好, 并且执行时间短, 与 origianl 的时间差不多
 
-- request size 与 request queue length 成反比的实验
-    all workloads are read and streaming
+- **request size 与 request queue length 成反比的实验**           
+    note: all workloads are read and streaming
     | size (kb) / length | alone (us) | shared (us) |
     | :-:| :-: | :-: |
     | 8 / 64  | 184 | 273 |
@@ -36,6 +36,6 @@
     | 16 / 64 | 282 | 488 |
     | 64 / 16 | 282 | 488 |
 
-    1. 进入 TSU 事务的大小最大为16 kB
+    1. 进入 TSU 事务的大小最大为16 kB, 最小为1 kB
     2. 事务的入队速率比事务的大小更能影响公平性, 入队的速率小的负载在单独运行时的延迟较短, 但往往被延缓
     3. 除去一些个别的测试用例, 写具有和读一样的结论
