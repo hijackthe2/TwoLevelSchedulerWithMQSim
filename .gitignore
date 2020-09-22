@@ -265,6 +265,7 @@ __pycache__/
 
 #output file
 out/
+!out/README.md
 *.xml
 !ssdconfig.xml
 !workload.xml
