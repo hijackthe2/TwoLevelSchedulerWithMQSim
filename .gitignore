@@ -264,8 +264,7 @@ __pycache__/
 *.pyc
 
 #output file
-out/
-!out/README.md
+out/*.txt
 *.xml
 !ssdconfig.xml
 !workload.xml
