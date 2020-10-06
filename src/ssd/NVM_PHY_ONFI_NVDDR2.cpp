@@ -94,6 +94,12 @@ namespace SSD_Components {
 		return NVDDR2DataInTransferTime(transaction->Data_and_metadata_size_in_byte, channels[transaction->Address.ChannelID]);
 	}
 
+	sim_time_type NVM_PHY_ONFI_NVDDR2::Expected_command_time(NVM_Transaction_Flash* transaction)
+	{
+		NVM::FlashMemory::Flash_Chip* targetChip = channels[transaction->Address.ChannelID]->Chips[transaction->Address.ChipID];
+		return targetChip->Get_command_execution_latency((int)transaction->Type, transaction->Address.PageID);
+	}
+
 	NVM_Transaction_Flash* NVM_PHY_ONFI_NVDDR2::Is_chip_busy_with_stream(NVM_Transaction_Flash* transaction)
 	{
 		ChipBookKeepingEntry* chipBKE = &bookKeepingTable[transaction->Address.ChannelID][transaction->Address.ChipID];
