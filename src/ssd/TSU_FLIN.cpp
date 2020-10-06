@@ -488,12 +488,11 @@ namespace SSD_Components
 			if ((*itr)->Stream_id == (*position)->Stream_id)
 			{
 				expected_last_time = (*itr)->Estimated_alone_waiting_time
-					+ _NVMController->Expected_transfer_time(*itr) + _NVMController->Expected_command_time(*itr);
+					+ _NVMController->Expected_transfer_time(*position) + _NVMController->Expected_command_time(*position);
 				if (expected_last_time + (*itr)->Issue_time > Simulator->Time())
 				{
-					expected_last_time += (*itr)->Issue_time - Simulator->Time();
+					expected_last_time = expected_last_time + (*itr)->Issue_time - Simulator->Time();
 				}
-				std::cout << expected_last_time << "\n";
 			}
 		}
 		(*position)->Estimated_alone_waiting_time = chip_busy_time + expected_last_time;
