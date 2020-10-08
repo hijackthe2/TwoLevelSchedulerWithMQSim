@@ -64,6 +64,10 @@ namespace SSD_Components
 		UserWriteTRCount = new unsigned int[stream_count];
 		UserReadTRBuffer = new Flash_Transaction_Queue[stream_count];
 		UserWriteTRBuffer = new Flash_Transaction_Queue[stream_count];
+		serviced_user_read_total_time = new sim_time_type[stream_count];
+		serviced_user_write_total_time = new sim_time_type[stream_count];
+		serviced_user_read_count = new unsigned int[stream_count];
+		serviced_user_write_count = new unsigned int[stream_count];
 		user_read_limit_speed = new unsigned int[stream_count];
 		user_write_limit_speed = new unsigned int[stream_count];
 		for (unsigned int stream_id = 0; stream_id < stream_count; ++stream_id)
@@ -72,6 +76,10 @@ namespace SSD_Components
 			user_write_arrival_count[stream_id] = 0;
 			UserReadTRCount[stream_id] = 0;
 			UserWriteTRCount[stream_id] = 0;
+			serviced_user_read_count[stream_id] = 0;
+			serviced_user_write_count[stream_id] = 0;
+			serviced_user_read_total_time[stream_id] = 0;
+			serviced_user_write_total_time[stream_id] = 0;
 			user_read_limit_speed[stream_id] = min_user_read_arrival_count;
 			user_write_limit_speed[stream_id] = min_user_write_arrival_count;
 			user_read_idx.push_back(stream_id);
@@ -112,6 +120,10 @@ namespace SSD_Components
 		delete[] UserWriteTRCount;
 		delete[] UserReadTRBuffer;
 		delete[] UserWriteTRBuffer;
+		delete[] serviced_user_read_count;
+		delete[] serviced_user_write_count;
+		delete[] serviced_user_read_total_time;
+		delete[] serviced_user_write_total_time;
 		delete[] user_read_limit_speed;
 		delete[] user_write_limit_speed;
 
@@ -184,6 +196,20 @@ namespace SSD_Components
 					: std::max(min_count, min_arrival_count);
 				arrival_count[stream_id] = 0;
 			}
+		}
+		for (unsigned int stream_id = 0; stream_id < stream_count; ++stream_id)
+		{
+			/*std::cout << stream_id << "\t" << user_read_arrival_count[stream_id] << "\t" << user_read_limit_speed[stream_id]
+				<< "\t" << user_write_arrival_count[stream_id] << "\t" << user_write_limit_speed[stream_id] << "\n";*/
+				/*std::cout << stream_id << "\t"
+					<< (serviced_user_read_count[stream_id] == 0 ? 0
+						: serviced_user_read_total_time[stream_id] / serviced_user_read_count[stream_id]) << "\t"
+					<< (serviced_user_write_count[stream_id] == 0 ? 0
+						: serviced_user_write_total_time[stream_id] / serviced_user_write_count[stream_id]) << "\n";*/
+			serviced_user_read_count[stream_id] = 0;
+			serviced_user_read_total_time[stream_id] = 0;
+			serviced_user_write_count[stream_id] = 0;
+			serviced_user_write_total_time[stream_id] = 0;
 		}
 		Simulator->Register_sim_event(Simulator->Time() + interval_time, this, 0, type);
 	}

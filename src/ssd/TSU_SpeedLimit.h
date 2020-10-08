@@ -51,6 +51,10 @@ namespace SSD_Components
 		unsigned int* UserWriteTRCount;
 		Flash_Transaction_Queue* UserReadTRBuffer;
 		Flash_Transaction_Queue* UserWriteTRBuffer;
+		sim_time_type* serviced_user_read_total_time;
+		sim_time_type* serviced_user_write_total_time;
+		unsigned int* serviced_user_read_count;
+		unsigned int* serviced_user_write_count;
 		void update(unsigned int* arrival_count, unsigned int* limit_speed, unsigned int max_arrival_count,
 			unsigned int middle_arrival_count, unsigned int min_arrival_count, std::vector<stream_id_type>& idx,
 			const unsigned int interval_time, int type);

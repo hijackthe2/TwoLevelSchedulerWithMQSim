@@ -114,31 +114,6 @@ namespace NVM
 					throw std::invalid_argument("Unsupported command for flash chip.");
 				}
 			}
-			sim_time_type Get_command_execution_latency(int type, flash_page_ID_type pageID)
-			{
-				int latencyType = 0;
-				if (flash_technology == Flash_Technology_Type::MLC)
-				{
-					latencyType = pageID % 2;
-				}
-				else if (flash_technology == Flash_Technology_Type::TLC)
-				{
-					//From: Yaakobi et al., "Characterization and Error-Correcting Codes for TLC Flash Memories", ICNC 2012
-					latencyType = (pageID <= 5) ? 0 : ((pageID <= 7) ? 1 : (((pageID - 8) >> 1) % 3));;
-				}
-				switch (type)
-				{
-				case 0/*SSD_Components::Transaction_Type::READ*/:
-					return _readLatency[latencyType] + _RBSignalDelayRead;
-				case 1/*SSD_Components::Transaction_Type::WRITE*/:
-					return _programLatency[latencyType] + _RBSignalDelayWrite;
-				case 2/*SSD_Components::Transaction_Type::ERASE*/:
-					return _eraseLatency + _RBSignalDelayErase;
-				default:
-					throw std::invalid_argument("Unsupported command for flash chip.");
-				}
-				return 0;
-			}
 			void Suspend(flash_die_ID_type dieID);
 			void Resume(flash_die_ID_type dieID);
 			sim_time_type GetSuspendProgramTime();

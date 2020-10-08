@@ -94,6 +94,7 @@ namespace SSD_Components
 		bool service_erase_transaction(NVM::FlashMemory::Flash_Chip* chip);
 		void service_transaction(NVM::FlashMemory::Flash_Chip* chip);
 
+
 		void initialize_scheduling_turns();
 		std::vector<unsigned int> scheduling_turn_assignments_read, scheduling_turn_assignments_write;
 		int** current_turn_read, ** current_turn_write;
