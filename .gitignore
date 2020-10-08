@@ -264,7 +264,7 @@ __pycache__/
 *.pyc
 
 #output file
-out/
+out/*.txt
 *.xml
 !ssdconfig.xml
 !workload.xml
