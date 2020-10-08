@@ -430,10 +430,12 @@ namespace SSD_Components
 			sim_time_type T_pos_alone = (*traverser)->Estimated_alone_waiting_time
 				+ _NVMController->Expected_transfer_time(*traverser) + _NVMController->Expected_command_time(*traverser);
 
-			sim_time_type T_pos_shared_after = time_to_finish + _NVMController->Expected_transfer_time(*end) + _NVMController->Expected_command_time(*end);
+			sim_time_type T_pos_shared_after = time_to_finish + _NVMController->Expected_transfer_time(*end) + _NVMController->Expected_command_time(*end)
+				+ (Simulator->Time() - (*end)->Issue_time);
 			double slowdown_pos_after = (double)T_pos_shared_after / T_pos_alone;
 
-			sim_time_type T_new_shared_after = time_to_finish - _NVMController->Expected_transfer_time(*traverser) + _NVMController->Expected_command_time(*traverser);
+			sim_time_type T_new_shared_after = time_to_finish + (Simulator->Time() - (*end)->Issue_time)
+				- _NVMController->Expected_transfer_time(*traverser) - _NVMController->Expected_command_time(*traverser);
 			double slowdown_new_after = (double)T_new_shared_after / T_new_alone;
 
 			double slowdown_min = min_slowdown_list.top();
@@ -488,7 +490,7 @@ namespace SSD_Components
 			if ((*itr)->Stream_id == (*position)->Stream_id)
 			{
 				expected_last_time = (*itr)->Estimated_alone_waiting_time
-					+ _NVMController->Expected_transfer_time(*position) + _NVMController->Expected_command_time(*position);
+					+ _NVMController->Expected_transfer_time(*itr) + _NVMController->Expected_command_time(*itr);
 				if (expected_last_time + (*itr)->Issue_time > Simulator->Time())
 				{
 					expected_last_time = expected_last_time + (*itr)->Issue_time - Simulator->Time();
