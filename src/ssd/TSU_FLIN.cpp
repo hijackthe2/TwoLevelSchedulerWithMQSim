@@ -386,6 +386,9 @@ namespace SSD_Components
 			return;
 		}
 		std::list<NVM_Transaction_Flash*>::iterator itr = queue->begin();
+		// add
+		std::unordered_map<stream_id_type, std::pair<double, unsigned int>> slowdown_info_per_workload;
+		// end add
 		sim_time_type time_to_finish = 0;
 		if (_NVMController->Is_chip_busy(*itr))
 			if (_NVMController->Expected_finish_time(*itr) > Simulator->Time())
@@ -406,6 +409,15 @@ namespace SSD_Components
 			sim_time_type T_TR_shared = time_to_finish + (Simulator->Time() - (*itr)->Issue_time);
 			double slowdown = (double)T_TR_shared / (double)((*itr)->Estimated_alone_waiting_time
 				+ _NVMController->Expected_transfer_time(*itr) + _NVMController->Expected_command_time(*itr));
+			// add
+			if (!slowdown_info_per_workload.count((*itr)->Stream_id))
+			{
+				slowdown_info_per_workload[(*itr)->Stream_id].first = 0.0;
+				slowdown_info_per_workload[(*itr)->Stream_id].second = 0;
+			}
+			slowdown_info_per_workload[(*itr)->Stream_id].first += slowdown;
+			slowdown_info_per_workload[(*itr)->Stream_id].second += 1;
+			// end add
 			if (slowdown < slowdown_min)
 				slowdown_min = slowdown;
 			if (slowdown > slowdown_max)
@@ -416,10 +428,22 @@ namespace SSD_Components
 		}
 		double fairness_max = slowdown_min / slowdown_max;
 
+		// add
+		double slowdown_min_workload = 10000000000000000000, slowdown_max_workload = 0;
+		for (const auto& a : slowdown_info_per_workload)
+		{
+			double slowdown = a.second.first / a.second.second;
+			if (slowdown < slowdown_min_workload)
+				slowdown_min_workload = slowdown;
+			if (slowdown > slowdown_max_workload)
+				slowdown_max_workload = slowdown;
+		}
+		fairness_max = slowdown_min_workload / slowdown_max_workload;
+		// end add
+
 		//Second pass: from end to start to find a position for TR_new sitting at end, that maximizes fairness
 		sim_time_type T_new_alone = (*end)->Estimated_alone_waiting_time
 			+ _NVMController->Expected_transfer_time(*end) + _NVMController->Expected_command_time(*end);
-		sim_time_type T_new_shared_before = time_to_finish;
 
 		auto final_position = end;
 		auto traverser = std::prev(end);
@@ -431,12 +455,23 @@ namespace SSD_Components
 				+ _NVMController->Expected_transfer_time(*traverser) + _NVMController->Expected_command_time(*traverser);
 
 			sim_time_type T_pos_shared_after = time_to_finish + _NVMController->Expected_transfer_time(*end) + _NVMController->Expected_command_time(*end)
-				+ (Simulator->Time() - (*end)->Issue_time);
+				+ (Simulator->Time() - (*traverser)->Issue_time);
 			double slowdown_pos_after = (double)T_pos_shared_after / T_pos_alone;
 
 			sim_time_type T_new_shared_after = time_to_finish + (Simulator->Time() - (*end)->Issue_time)
-				- _NVMController->Expected_transfer_time(*traverser) - _NVMController->Expected_command_time(*traverser);
+				- _NVMController->Expected_transfer_time(*traverser) - _NVMController->Expected_command_time(*traverser)
+				+ _NVMController->Expected_transfer_time(*end) + _NVMController->Expected_command_time(*end);
 			double slowdown_new_after = (double)T_new_shared_after / T_new_alone;
+
+			// add
+			sim_time_type T_pos_shared_before = time_to_finish + (Simulator->Time() - (*traverser)->Issue_time);
+			double slowdown_pos_before = (double)T_pos_shared_before / T_pos_alone;
+			slowdown_info_per_workload[(*traverser)->Stream_id].first += slowdown_pos_after - slowdown_pos_before;
+			sim_time_type T_new_shared_before = time_to_finish + (Simulator->Time() - (*end)->Issue_time)
+				+ _NVMController->Expected_transfer_time(*end) + _NVMController->Expected_command_time(*end);
+			double slowdown_new_before = (double)T_new_shared_before / T_new_alone;
+			slowdown_info_per_workload[(*end)->Stream_id].first += slowdown_new_after - slowdown_new_before;
+			// end add
 
 			double slowdown_min = min_slowdown_list.top();
 			min_slowdown_list.pop();
@@ -453,6 +488,18 @@ namespace SSD_Components
 				slowdown_min = slowdown_new_after;
 
 			double fairness_after = (double)slowdown_min / slowdown_max;
+			// add
+			double slowdown_min_workload = 10000000000000000000, slowdown_max_workload = 0;
+			for (const auto& a : slowdown_info_per_workload)
+			{
+				double slowdown = a.second.first / a.second.second;
+				if (slowdown < slowdown_min_workload)
+					slowdown_min_workload = slowdown;
+				if (slowdown > slowdown_max_workload)
+					slowdown_max_workload = slowdown;
+			}
+			fairness_after = slowdown_min_workload / slowdown_max_workload;
+			// end add
 			if (fairness_after > fairness_max)
 			{
 				fairness_max = fairness_after;
@@ -460,7 +507,7 @@ namespace SSD_Components
 			}
 
 			time_to_finish -= _NVMController->Expected_transfer_time(*traverser) + _NVMController->Expected_command_time(*traverser);
-			traverser--;
+			--traverser;
 		}
 
 		if (final_position != end)
@@ -532,14 +579,15 @@ namespace SSD_Components
 		int stream_count = 0;
 		for (unsigned int i = 0; i < priority_stream_count; i++)
 		{
-			if (transaction_count[i] == 0)
+			stream_id_type stream_id = priority_stream_id[i];
+			if (transaction_count[stream_id] == 0)
 				continue;
 			stream_count++;
-			double average_slowdown = sum_slowdown[i] / transaction_count[i];
+			double average_slowdown = sum_slowdown[stream_id] / transaction_count[stream_id];
 			if (average_slowdown > slowdown_max)
 			{
 				slowdown_max = average_slowdown;
-				flow_with_max_average_slowdown = priority_stream_id[i];
+				flow_with_max_average_slowdown = stream_id;
 			}
 			if (average_slowdown < slowdown_min)
 				slowdown_min = average_slowdown;
