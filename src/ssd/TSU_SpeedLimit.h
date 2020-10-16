@@ -21,6 +21,7 @@ namespace SSD_Components
 		~TSU_SpeedLimit();
 		void Prepare_for_transaction_submit();
 		void Submit_transaction(NVM_Transaction_Flash* transaction);
+		void handle_transaction_serviced_signal_from_PHY(NVM_Transaction_Flash* transaction);
 		void Schedule();
 
 		void Start_simulation();
@@ -51,6 +52,11 @@ namespace SSD_Components
 		unsigned int* UserWriteTRCount;
 		Flash_Transaction_Queue* UserReadTRBuffer;
 		Flash_Transaction_Queue* UserWriteTRBuffer;
+		sim_time_type* shared_total_time;
+		sim_time_type* alone_total_time;
+		unsigned long long* total_count;
+		unsigned long*** remain_read_queue_count;
+		unsigned long*** remain_write_queue_count;
 		void update(unsigned int* arrival_count, unsigned int* limit_speed, unsigned int max_arrival_count,
 			unsigned int middle_arrival_count, unsigned int min_arrival_count, std::vector<stream_id_type>& idx,
 			const unsigned int interval_time, int type);
@@ -63,6 +69,8 @@ namespace SSD_Components
 		std::list<std::pair<Transaction_Type, Transaction_Source_Type>>** transaction_waiting_dispatch_slots;
 		unsigned int*** serviced_writes_since_last_GC;
 		const unsigned int GC_FLIN = 1000;
+
+		void estimate_alone_time(NVM_Transaction_Flash* transaction, unsigned long long remain_count);
 
 		bool service_read_transaction(NVM::FlashMemory::Flash_Chip* chip);
 		bool service_write_transaction(NVM::FlashMemory::Flash_Chip* chip);

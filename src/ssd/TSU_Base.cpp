@@ -1,5 +1,6 @@
 #include <string>
 #include "TSU_Base.h"
+#include "TSU_SpeedLimit.h"
 
 namespace SSD_Components
 {
@@ -39,6 +40,14 @@ namespace SSD_Components
 	void TSU_Base::handle_transaction_serviced_signal_from_PHY(NVM_Transaction_Flash* transaction)
 	{
 		//TSU does nothing. The generator of the transaction will handle it.
+		switch (_my_instance->type)
+		{
+		case Flash_Scheduling_Type::SPEED_LIMIT:
+			((TSU_SpeedLimit*)_my_instance)->handle_transaction_serviced_signal_from_PHY(transaction);
+			break;
+		default:
+			break;
+		}
 	}
 
 	void TSU_Base::handle_channel_idle_signal(flash_channel_ID_type channelID)

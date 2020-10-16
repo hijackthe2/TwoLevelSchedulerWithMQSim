@@ -28,7 +28,7 @@
 			 <CMT_Capacity>2097152</CMT_Capacity>
 			 <CMT_Sharing_Mode>SHARED</CMT_Sharing_Mode>
 			 <Plane_Allocation_Scheme>CWDP</Plane_Allocation_Scheme>
-			 <Transaction_Scheduling_Policy>FLIN</Transaction_Scheduling_Policy>
+			 <Transaction_Scheduling_Policy>SPEED_LIMIT</Transaction_Scheduling_Policy>
 			 <Overprovisioning_Ratio>0.07</Overprovisioning_Ratio>
 			 <GC_Exec_Threshold>0.05000</GC_Exec_Threshold>
 			 <GC_Block_Selection_Policy>RGA</GC_Block_Selection_Policy>

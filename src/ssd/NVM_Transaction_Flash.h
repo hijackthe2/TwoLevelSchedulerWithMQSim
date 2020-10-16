@@ -33,6 +33,8 @@ namespace SSD_Components
 		bool Physical_address_determined;
 		sim_time_type Estimated_alone_waiting_time;//Used in scheduling methods, such as FLIN, where fairness and QoS is considered in scheduling
 		bool FLIN_Barrier;//Especially used in queue reordering inf FLIN scheduler
+		sim_time_type alone_time = 0;
+		sim_time_type shared_time = 0;
 	private:
 
 	};
