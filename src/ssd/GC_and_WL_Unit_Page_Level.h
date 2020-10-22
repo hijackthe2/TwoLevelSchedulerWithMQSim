@@ -5,6 +5,7 @@
 #include "NVM_PHY_ONFI.h"
 #include "../utils/RandomGenerator.h"
 #include <queue>
+#include "../exec/Externer.h"
 
 
 namespace SSD_Components

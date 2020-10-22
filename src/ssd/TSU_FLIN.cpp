@@ -1037,15 +1037,15 @@ namespace SSD_Components
 		pw_write = -1;
 		if (read_slot)
 		{
-			read_cost = _NVMController->Expected_transfer_time(read_slot) + _NVMController->Expected_finish_time(read_slot);
+			read_cost = _NVMController->Expected_transfer_time(read_slot) + _NVMController->Expected_command_time(read_slot);
 		}
 		if (write_slot)
 		{
-			write_cost = _NVMController->Expected_transfer_time(write_slot) + _NVMController->Expected_finish_time(write_slot);
+			write_cost = _NVMController->Expected_transfer_time(write_slot) + _NVMController->Expected_command_time(write_slot);
 		}
 		if (!GCEraseTRQueue[channel_id][chip_id].empty())
 		{
-			T_erase_memory = _NVMController->Expected_finish_time(GCEraseTRQueue[channel_id][chip_id].front());
+			T_erase_memory = _NVMController->Expected_command_time(GCEraseTRQueue[channel_id][chip_id].front());
 		}
 		sim_time_type T_GC = GCM == 0 ? 0 : GCM * (read_cost + write_cost) + T_erase_memory;
 		if (read_cost != 0)

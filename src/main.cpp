@@ -9,13 +9,11 @@
 #include "exec/Host_System.h"
 #include "utils/rapidxml/rapidxml.hpp"
 #include "utils/DistributionTypes.h"
+#include "exec/Global.h"
+#include "exec/Externer.h"
 
 using namespace std;
-/*
-函数：command_line_args
-功能：获取输入的参数input_file_path和workload_file_path
-输入：argv[] input_file_path workload_file_path 引用参数调用
-*/
+
 void command_line_args(char* argv[], string& input_file_path, string& workload_file_path)
 {
 
@@ -38,11 +36,7 @@ void command_line_args(char* argv[], string& input_file_path, string& workload_f
 		}
 	}
 }
-/*
-功能：读取器件的配置参数
-输入：路径（ssd_config_file_path），执行参数（exec_params）
-执行参数（exec_params）指针调用，所以是可以被修改的
-*/
+
 void read_configuration_parameters(const string ssd_config_file_path, Execution_Parameter_Set* exec_params)
 {
 	ifstream ssd_config_file;
@@ -100,9 +94,7 @@ void read_configuration_parameters(const string ssd_config_file_path, Execution_
 
 	ssd_config_file.close();
 }
-/*
-功能：导入workload_defs_file_path的参数
-*/
+
 std::vector<std::vector<IO_Flow_Parameter_Set*>*>* read_workload_definitions(const string workload_defs_file_path)
 {
 	std::vector<std::vector<IO_Flow_Parameter_Set*>*>* io_scenarios = new std::vector<std::vector<IO_Flow_Parameter_Set*>*>;
@@ -258,10 +250,7 @@ std::vector<std::vector<IO_Flow_Parameter_Set*>*>* read_workload_definitions(con
 
 	return io_scenarios;
 }
-/*
-功能：输出结果
-输入：SSD_Device& ssd, Host_System& host, 输出文件路径output_file_path
-*/
+
 void collect_results(SSD_Device& ssd, Host_System& host, const char* output_file_path)
 {
 	Utils::XmlWriter xmlwriter;
@@ -313,6 +302,12 @@ int main(int argc, char* argv[])
 	read_configuration_parameters(ssd_config_file_path, exec_params);
 	std::vector<std::vector<IO_Flow_Parameter_Set*>*>* io_scenarios = read_workload_definitions(workload_defs_file_path);
 
+	gc_fs.open("out/gc_info.txt", std::fstream::out);
+	gc_fs << std::fixed << std::setprecision(3);
+	gc_fs << "plane_invalid_page_percent\t" << "plane_valid_page_percent\t" << "plane_free_page_percent\t" << "plane_free_block_percent\t"
+		<< "block_invalid_page_percent\t" << "proportional_slowdown\t" << "has_gc_transaction\t"
+		<< "GC" << endl;
+
 	int cntr = 1;
 	for (auto io_scen = io_scenarios->begin(); io_scen != io_scenarios->end(); io_scen++, cntr++)
 	{
@@ -348,5 +343,6 @@ int main(int argc, char* argv[])
 	}
 
 	//cin.get();
+	gc_fs.close();
 	return 0;
 }

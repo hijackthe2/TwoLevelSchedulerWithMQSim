@@ -477,6 +477,12 @@
     <ClInclude Include="src\ssd\TSU_SpeedLimit.h">
       <Filter>ssd</Filter>
     </ClInclude>
+    <ClInclude Include="src\exec\Global.h">
+      <Filter>exec</Filter>
+    </ClInclude>
+    <ClInclude Include="src\exec\Externer.h">
+      <Filter>exec</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="README.md" />

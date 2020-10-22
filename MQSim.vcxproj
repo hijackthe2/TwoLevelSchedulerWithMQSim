@@ -85,7 +85,9 @@
   <ItemGroup>
     <ClInclude Include="src\exec\Device_Parameter_Set.h" />
     <ClInclude Include="src\exec\Execution_Parameter_Set.h" />
+    <ClInclude Include="src\exec\Externer.h" />
     <ClInclude Include="src\exec\Flash_Parameter_Set.h" />
+    <ClInclude Include="src\exec\Global.h" />
     <ClInclude Include="src\exec\Host_Parameter_Set.h" />
     <ClInclude Include="src\exec\Host_System.h" />
     <ClInclude Include="src\exec\IO_Flow_Parameter_Set.h" />

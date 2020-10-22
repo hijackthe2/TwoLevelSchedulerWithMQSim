@@ -1,6 +1,7 @@
 #ifndef TSU_SPEEDLIMIT_H
 #define TSU_SPEEDLIMIT_H
 
+#include <algorithm>
 #include "FTL.h"
 #include "TSU_Base.h"
 #include "NVM_Transaction_Flash.h"
@@ -27,6 +28,8 @@ namespace SSD_Components
 		void Start_simulation();
 		void Validate_simulation_config();
 		void Execute_simulator_event(MQSimEngine::Sim_Event* event);
+		double proportional_slowdown(stream_id_type gc_stream_id);
+		size_t GCEraseTRQueueSize(flash_channel_ID_type channel_id, flash_chip_ID_type chip_id);
 		void Report_results_in_XML(std::string name_prefix, Utils::XmlWriter& xmlwriter);
 	private:
 		Flash_Transaction_Queue** UserReadTRQueue;
@@ -71,6 +74,7 @@ namespace SSD_Components
 		const unsigned int GC_FLIN = 1000;
 
 		void estimate_alone_time(NVM_Transaction_Flash* transaction, unsigned long long remain_count);
+		void adjust_alone_time(const Flash_Transaction_Queue::iterator& dispatched_it, Flash_Transaction_Queue* queue, Flash_Transaction_Queue* buffer);
 
 		bool service_read_transaction(NVM::FlashMemory::Flash_Chip* chip);
 		bool service_write_transaction(NVM::FlashMemory::Flash_Chip* chip);

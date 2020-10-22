@@ -4,6 +4,7 @@
 #include "GC_and_WL_Unit_Page_Level.h"
 #include "Flash_Block_Manager.h"
 #include "FTL.h"
+#include "TSU_SpeedLimit.h"
 
 namespace SSD_Components
 {
@@ -136,6 +137,30 @@ namespace SSD_Components
 			address_mapping_unit->Set_barrier_for_accessing_physical_block(gc_candidate_address);//Lock the block, so no user request can intervene while the GC is progressing
 			if (block_manager->Can_execute_gc_wl(gc_candidate_address))//If there are ongoing requests targeting the candidate block, the gc execution should be postponed
 			{
+				// plane
+				double plane_invalid_page_percent = (double)pbke->Invalid_pages_count / pbke->Total_pages_count;
+				double plane_valid_page_percent = (double)pbke->Valid_pages_count / pbke->Total_pages_count;
+				double plane_free_page_percent = (double)pbke->Free_pages_count / pbke->Total_pages_count;
+				double plane_free_block_percent = (double)free_block_pool_size / block_no_per_plane;
+				// block
+				double block_invalid_page_percent = (double)block->Invalid_page_count / pages_no_per_block;
+
+				// proportional slowdown
+				double proportional_slowdown = ((TSU_SpeedLimit*)tsu)->proportional_slowdown(block->Stream_id);
+				//std::cout << block->Stream_id << "\t" << proportional_slowdown << "\n";
+
+				// gc queue
+				bool has_gc_transaction = ((TSU_SpeedLimit*)tsu)->GCEraseTRQueueSize(plane_address.ChannelID, plane_address.ChipID) > 0;
+
+				gc_fs << plane_invalid_page_percent << "\t" << plane_valid_page_percent << "\t" << plane_free_page_percent << "\t"
+					<< plane_free_block_percent << "\t" << block_invalid_page_percent << "\t" << proportional_slowdown << "\t"
+					<< has_gc_transaction << "\t" << 1 << std::endl;
+
+				if (Stats::Total_gc_executions % 1000 == 0)
+				{
+					std::cout << "gc\t" << (double)free_block_pool_size / block_no_per_plane << "\t"
+						<< free_block_pool_size << "\n";
+				}
 				Stats::Total_gc_executions++;
 				tsu->Prepare_for_transaction_submit();
 

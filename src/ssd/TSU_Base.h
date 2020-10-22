@@ -2,6 +2,7 @@
 #define TSU_H
 
 #include <list>
+#include <limits.h>
 #include "../sim/Sim_Defs.h"
 #include "../sim/Sim_Object.h"
 #include "../nvm_chip/flash_memory/Flash_Chip.h"
