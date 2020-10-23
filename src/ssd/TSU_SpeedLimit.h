@@ -74,7 +74,8 @@ namespace SSD_Components
 		const unsigned int GC_FLIN = 1000;
 
 		void estimate_alone_time(NVM_Transaction_Flash* transaction, unsigned long long remain_count);
-		void adjust_alone_time(const Flash_Transaction_Queue::iterator& dispatched_it, Flash_Transaction_Queue* queue, Flash_Transaction_Queue* buffer);
+		void adjust_alone_time(stream_id_type dispatched_stream_id, sim_time_type adjust_time, Transaction_Type type,
+			Transaction_Source_Type source, Flash_Transaction_Queue* queue, Flash_Transaction_Queue* buffer);
 
 		bool service_read_transaction(NVM::FlashMemory::Flash_Chip* chip);
 		bool service_write_transaction(NVM::FlashMemory::Flash_Chip* chip);
