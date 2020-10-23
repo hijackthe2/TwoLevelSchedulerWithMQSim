@@ -444,19 +444,19 @@ namespace SSD_Components
 			{
 				adjust_time *= 3;
 			}
-			else if (type == Transaction_Type::WRITE)
+			/*else if (type == Transaction_Type::WRITE)
 			{
-				//adjust_time *= 2;
-			}
+				adjust_time *= 2;
+			}*/
 			else if (type == Transaction_Type::ERASE)
 			{
 				adjust_time *= 2;
 			}
 		}
-		else if (source == Transaction_Source_Type::MAPPING)
+		/*else if (source == Transaction_Source_Type::MAPPING)
 		{
 
-		}
+		}*/
 		for (auto it = queue->begin(); it != queue->end(); ++it)
 		{
 			if (dispatched_stream_id == (*it)->Stream_id)
