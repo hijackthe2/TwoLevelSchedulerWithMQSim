@@ -146,11 +146,19 @@ namespace SSD_Components
 				double block_invalid_page_percent = (double)block->Invalid_page_count / pages_no_per_block;
 
 				// proportional slowdown
-				double proportional_slowdown = ((TSU_SpeedLimit*)tsu)->proportional_slowdown(block->Stream_id);
+				double proportional_slowdown = 1.0;
+				if (tsu->get_type() == Flash_Scheduling_Type::SPEED_LIMIT)
+				{
+					proportional_slowdown = ((TSU_SpeedLimit*)tsu)->proportional_slowdown(block->Stream_id);
+				}
 				//std::cout << block->Stream_id << "\t" << proportional_slowdown << "\n";
 
 				// gc queue
-				bool has_gc_transaction = ((TSU_SpeedLimit*)tsu)->GCEraseTRQueueSize(plane_address.ChannelID, plane_address.ChipID) > 0;
+				bool has_gc_transaction = false;
+				if (tsu->get_type() == Flash_Scheduling_Type::SPEED_LIMIT)
+				{
+					has_gc_transaction = ((TSU_SpeedLimit*)tsu)->GCEraseTRQueueSize(plane_address.ChannelID, plane_address.ChipID) > 0;
+				}
 
 				gc_fs << plane_invalid_page_percent << "\t" << plane_valid_page_percent << "\t" << plane_free_page_percent << "\t"
 					<< plane_free_block_percent << "\t" << block_invalid_page_percent << "\t" << proportional_slowdown << "\t"
