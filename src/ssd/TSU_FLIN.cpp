@@ -984,6 +984,7 @@ namespace SSD_Components
 		}
 		else if (pw_write >= 0 && pw_write > pw_read)
 		{
+			bool execute_gc = false;
 			if (ftl->BlockManager->Get_plane_bookkeeping_entry(write_slot->Address)->Free_pages_count < GC_flin)
 			{
 				while (GCM > 0)
@@ -992,13 +993,17 @@ namespace SSD_Components
 						{ Transaction_Type::READ, Transaction_Source_Type::GC_WL });
 					transaction_waiting_dispatch_slots[chip->ChannelID][chip->ChipID].push_back(
 						{ Transaction_Type::WRITE, Transaction_Source_Type::GC_WL });
+					execute_gc = true;
 					GCM--;
 				}
 			}
 			transaction_waiting_dispatch_slots[chip->ChannelID][chip->ChipID].push_back(
 				{ Transaction_Type::WRITE, Transaction_Source_Type::USERIO });
-			transaction_waiting_dispatch_slots[chip->ChannelID][chip->ChipID].push_back(
-				{ Transaction_Type::ERASE, Transaction_Source_Type::GC_WL });
+			if (execute_gc)
+			{
+				transaction_waiting_dispatch_slots[chip->ChannelID][chip->ChipID].push_back(
+					{ Transaction_Type::ERASE, Transaction_Source_Type::GC_WL });
+			}
 		}
 		bool success = false;
 		while (!transaction_waiting_dispatch_slots[chip->ChannelID][chip->ChipID].empty() && !success)
