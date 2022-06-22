@@ -233,6 +233,7 @@ namespace SSD_Components
 			if (((NVM_Transaction_Flash_RD*)transaction)->RelatedWrite != NULL)
 			{
 				((NVM_Transaction_Flash_RD*)transaction)->RelatedWrite->RelatedRead = NULL;
+				//auto tr = ((NVM_Transaction_Flash_RD*)transaction)->RelatedWrite;
 				return;
 			}
 			switch (Data_Cache_Manager_Flash_Simple::caching_mode_per_input_stream[transaction->Stream_id])

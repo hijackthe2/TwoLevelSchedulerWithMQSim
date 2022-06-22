@@ -456,6 +456,7 @@ namespace SSD_Components
 					break;
 				}
 				case GC_Block_Selection_Policy_Type::RGA://Based on: B. Van Houdt, "A mean field model for a class of garbage collection algorithms in flash-based solid state drives", SIGMETRICS 2013.
+				case GC_Block_Selection_Policy_Type::FBS:
 				{
 					for (unsigned int i = 0; i <= page_no_per_block; i++)
 						steadystate_block_status_probability.push_back(Utils::Combination_count(page_no_per_block, i) * std::pow(rho, i) * std::pow(1 - rho, page_no_per_block - i));
@@ -554,6 +555,7 @@ namespace SSD_Components
 				case GC_Block_Selection_Policy_Type::FIFO:
 				case GC_Block_Selection_Policy_Type::RANDOM:
 				case GC_Block_Selection_Policy_Type::RANDOM_P:
+				case GC_Block_Selection_Policy_Type::FBS:
 					break;
 				}
 				break;
@@ -570,6 +572,7 @@ namespace SSD_Components
 						break;
 					}
 					case GC_Block_Selection_Policy_Type::RGA://Based on: B. Van Houdt, "A mean field model for a class of garbage collection algorithms in flash-based solid state drives", SIGMETRICS 2013.
+					case GC_Block_Selection_Policy_Type::FBS:
 					{
 						for (unsigned int i = 0; i <= page_no_per_block; i++)
 							steadystate_block_status_probability.push_back(Utils::Combination_count(page_no_per_block, i) * std::pow(rho, i) * std::pow(1 - rho, page_no_per_block - i));

@@ -25,7 +25,14 @@ namespace SSD_Components
 		WCDP, WCPD, WDCP, WDPC, WPCD, WPDC,
 		DCWP, DCPW, DWCP, DWPC, DPCW, DPWC,
 		PCWD, PCDW, PWCD, PWDC, PDCW, PDWC,
-		RBGC
+		RBGC, RRA, GRRA,
+		EQFA, // Empty Queue First Allocation, otherwise select a queue with CWDP
+		SLF_RBGC, SLF_RRA, SLF_GRRA, SLF_EQFA, SLF_CWDP, // dispatch transaction first and then translate only works for ideal mapping table
+		CW, CW_RRA, CW_RBGC, CW_EQFA, CW_GRRA, // allocate CW first, then decide DP according to the order that chip services
+		EQCH, // assign the same number of channels for workloads
+		FPFA, // free plane first allocation
+		RCW, // round robin allocation for CW, DP is decided by CWDP
+		RCWGDP, // round robin allocation for CW for each workload, global round-robin allocation for DP
 	};
 	enum class CMT_Sharing_Mode { SHARED, EQUAL_SIZE_PARTITIONING };
 
@@ -65,6 +72,9 @@ namespace SSD_Components
 		virtual NVM::FlashMemory::Physical_Page_Address Convert_ppa_to_address(const PPA_type ppa) = 0;
 		virtual void Convert_ppa_to_address(const PPA_type ppa, NVM::FlashMemory::Physical_Page_Address& address) = 0;
 		virtual PPA_type Convert_address_to_ppa(const NVM::FlashMemory::Physical_Page_Address& pageAddress) = 0;
+		virtual void translate_lpa_to_ppa_for_write_with_slf(NVM_Transaction_Flash* transaction) = 0;
+		virtual void allocate_plane_for_gc_write(NVM_Transaction_Flash_WR* transaction) = 0;
+		virtual void allocate_DP_for_write(NVM_Transaction_Flash* transaction) = 0;
 
 		/*********************************************************************************************************************
 		 These are system state consistency control functions that are used for garbage collection and wear-leveling execution.

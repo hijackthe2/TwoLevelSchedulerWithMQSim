@@ -14,7 +14,7 @@
 			 <HostInterface_Type>NVME</HostInterface_Type>
 			 <IO_Queue_Depth>65535</IO_Queue_Depth>
 			 <Queue_Fetch_Size>512</Queue_Fetch_Size>
-			 <Caching_Mechanism>SIMPLE</Caching_Mechanism>
+			 <Caching_Mechanism>ADVANCED</Caching_Mechanism>
 			 <Data_Cache_Sharing_Mode>SHARED</Data_Cache_Sharing_Mode>
 			 <Data_Cache_Capacity>268435456</Data_Cache_Capacity>
 			 <Data_Cache_DRAM_Row_Size>8192</Data_Cache_DRAM_Row_Size>
@@ -27,14 +27,14 @@
 			 <Ideal_Mapping_Table>true</Ideal_Mapping_Table>
 			 <CMT_Capacity>2097152</CMT_Capacity>
 			 <CMT_Sharing_Mode>SHARED</CMT_Sharing_Mode>
-			 <Plane_Allocation_Scheme>RBGC</Plane_Allocation_Scheme>
-			 <Transaction_Scheduling_Policy>SPEED_LIMIT</Transaction_Scheduling_Policy>
+			 <Plane_Allocation_Scheme>RRA</Plane_Allocation_Scheme>
+			 <Transaction_Scheduling_Policy>SIMPLE_FLIN</Transaction_Scheduling_Policy>
 			 <Overprovisioning_Ratio>0.07</Overprovisioning_Ratio>
-			 <GC_Exec_Threshold>0.05000</GC_Exec_Threshold>
-			 <GC_Block_Selection_Policy>RGA</GC_Block_Selection_Policy>
+			 <GC_Exec_Threshold>0.850000</GC_Exec_Threshold>
+			 <GC_Block_Selection_Policy>GREEDY</GC_Block_Selection_Policy>
 			 <Use_Copyback_for_GC>false</Use_Copyback_for_GC>
 			 <Preemptible_GC_Enabled>false</Preemptible_GC_Enabled>
-			 <GC_Hard_Threshold>0.005000</GC_Hard_Threshold>
+			 <GC_Hard_Threshold>0.700000</GC_Hard_Threshold>
 			 <Dynamic_Wearleveling_Enabled>true</Dynamic_Wearleveling_Enabled>
 			 <Static_Wearleveling_Enabled>true</Static_Wearleveling_Enabled>
 			 <Static_Wearleveling_Threshold>100</Static_Wearleveling_Threshold>

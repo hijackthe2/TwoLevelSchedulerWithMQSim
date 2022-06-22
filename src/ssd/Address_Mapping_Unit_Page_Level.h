@@ -6,11 +6,13 @@
 #include <queue>
 #include <set>
 #include <list>
+#include <ctime>
 #include "Address_Mapping_Unit_Base.h"
 #include "Flash_Block_Manager_Base.h"
 #include "SSD_Defs.h"
 #include "NVM_Transaction_Flash_RD.h"
 #include "NVM_Transaction_Flash_WR.h"
+#include "../utils/RandomGenerator.h"
 
 namespace SSD_Components
 {
@@ -155,6 +157,7 @@ namespace SSD_Components
 		void Get_data_mapping_info_for_gc(const stream_id_type stream_id, const LPA_type lpa, PPA_type& ppa, page_status_type& page_state);
 		void Get_translation_mapping_info_for_gc(const stream_id_type stream_id, const MVPN_type mvpn, MPPN_type& mppa, sim_time_type& timestamp);
 		void Allocate_new_page_for_gc(NVM_Transaction_Flash_WR* transaction, bool is_translation_page);
+		void allocate_plane_for_gc_write(NVM_Transaction_Flash_WR* transaction);
 
 		void Store_mapping_table_on_flash_at_start();
 		LPA_type Get_logical_pages_count(stream_id_type stream_id);
@@ -168,6 +171,8 @@ namespace SSD_Components
 		void Remove_barrier_for_accessing_lpa(stream_id_type stream_id, LPA_type lpa);
 		void Remove_barrier_for_accessing_mvpn(stream_id_type stream_id, MVPN_type mpvn);
 		void Start_servicing_writes_for_overfull_plane(const NVM::FlashMemory::Physical_Page_Address plane_address);
+		void translate_lpa_to_ppa_for_write_with_slf(NVM_Transaction_Flash* transaction);
+		void allocate_DP_for_write(NVM_Transaction_Flash* transaction);
 	private:
 		static Address_Mapping_Unit_Page_Level* _my_instance;
 		unsigned int cmt_capacity;
@@ -201,8 +206,31 @@ namespace SSD_Components
 
 		NVM::FlashMemory::Physical_Page_Address* round_robin_address;
 		NVM::FlashMemory::Physical_Page_Address* round_robin_mapping_address;
-		void allocate_round_robin_address_bypass_gc(NVM::FlashMemory::Physical_Page_Address& rra,
-			NVM::FlashMemory::Physical_Page_Address& target_address);
+		NVM::FlashMemory::Physical_Page_Address global_round_robin_address;
+		NVM::FlashMemory::Physical_Page_Address** global_round_robin_address_per_chip;
+		void round_robin_allocation_bypass_gc(NVM::FlashMemory::Physical_Page_Address& rra,
+			NVM::FlashMemory::Physical_Page_Address& target_address, AddressMappingDomain* domain);
+		void round_robin_allocation(NVM::FlashMemory::Physical_Page_Address& rra,
+			NVM::FlashMemory::Physical_Page_Address& target_address, AddressMappingDomain* domain);
+		void empty_queue_first_allocation(NVM::FlashMemory::Physical_Page_Address& target_addres, AddressMappingDomain* domain, const LPA_type lpa);
+		void Translate_lpa_to_ppa_and_dispatch_with_slf(const std::list<NVM_Transaction*>& transactionList);
+
+		void Translate_lpa_to_ppa_and_dispatch_CW(const std::list<NVM_Transaction*>& transactionList);
+		void allocate_CW(const stream_id_type stream_id, const LPA_type lpa, NVM::FlashMemory::Physical_Page_Address& address);
+		void round_robin_allocation_bypass_gc_CW(NVM::FlashMemory::Physical_Page_Address& rra,
+			NVM::FlashMemory::Physical_Page_Address& target_address, AddressMappingDomain* domain);
+		void round_robin_allocation_CW(NVM::FlashMemory::Physical_Page_Address& rra,
+			NVM::FlashMemory::Physical_Page_Address& target_address, AddressMappingDomain* domain);
+		void empty_queue_first_allocation_CW(NVM::FlashMemory::Physical_Page_Address& target_address, AddressMappingDomain* domain, const LPA_type lpa);
+		void equal_channel(NVM::FlashMemory::Physical_Page_Address& target_address, AddressMappingDomain* domain, const LPA_type lpa,
+			const stream_id_type stream_count, const stream_id_type stream_id);
+		void free_plane_first_allocation(NVM::FlashMemory::Physical_Page_Address& target_address, AddressMappingDomain* domain, const LPA_type lpa);
+		void round_robin_CW(NVM::FlashMemory::Physical_Page_Address& rra,
+			NVM::FlashMemory::Physical_Page_Address& target_address, AddressMappingDomain* domain, const LPA_type lpa);
+		void round_robin_CW_global_DP(NVM::FlashMemory::Physical_Page_Address& cw_rra, NVM::FlashMemory::Physical_Page_Address& target_address,
+			AddressMappingDomain* domain);
+
+		Utils::RandomGenerator* random_address_generator;
 	};
 
 }

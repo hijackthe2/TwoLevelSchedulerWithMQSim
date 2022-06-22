@@ -7,8 +7,8 @@
 #include "../nvm_chip/flash_memory/FlashTypes.h"
 #include "../nvm_chip/flash_memory/Flash_Command.h"
 #include "NVM_PHY_ONFI.h"
-#include "ONFI_Channel_NVDDR2.h"
 #include "Flash_Transaction_Queue.h"
+#include "ONFI_Channel_NVDDR2.h"
 
 namespace SSD_Components
 {
@@ -88,6 +88,7 @@ namespace SSD_Components
 	public:
 		NVM_PHY_ONFI_NVDDR2(const sim_object_id_type& id, ONFI_Channel_NVDDR2** channels,
 			unsigned int ChannelCount, unsigned int chip_no_per_channel, unsigned int DieNoPerChip, unsigned int PlaneNoPerDie);
+		virtual ~NVM_PHY_ONFI_NVDDR2();
 		void Setup_triggers();
 		void Validate_simulation_config();
 		void Start_simulation();
@@ -103,11 +104,18 @@ namespace SSD_Components
 		sim_time_type Expected_finish_time(NVM::FlashMemory::Flash_Chip* chip);
 		sim_time_type Expected_finish_time(NVM_Transaction_Flash* transaction);
 		sim_time_type Expected_transfer_time(NVM_Transaction_Flash* transaction);
+		sim_time_type Expected_transfer_time(unsigned int metadata_size_in_byte, flash_channel_ID_type channel_id);
 		sim_time_type Expected_command_time(NVM_Transaction_Flash* transaction);
 		NVM_Transaction_Flash* Is_chip_busy_with_stream(NVM_Transaction_Flash* transaction);
+		bool Is_chip_busy_with_gc(flash_channel_ID_type channel_id, flash_chip_ID_type chip_id, flash_block_ID_type die_id, flash_plane_ID_type plane_id);
 		bool Is_chip_busy_with_gc(flash_channel_ID_type channel_id, flash_chip_ID_type chip_id);
 		bool Is_chip_busy(NVM_Transaction_Flash* transaction);
+		bool Is_chip_busy(flash_channel_ID_type channel_id, flash_chip_ID_type chip_id);
+		void test_transaction_for_conflicting_with_gc(NVM_Transaction_Flash* transaction);
 		void Change_memory_status_preconditioning(const NVM::NVM_Memory_Address* address, const void* status_info);
+		ONFI_Channel_NVDDR2* Get_channel(flash_channel_ID_type channel_id) { return channels[channel_id]; }
+		const size_t Get_max_size() { return this->max_size; }
+		void Get_plane_recently_serviced_usr_time(const NVM::FlashMemory::Physical_Page_Address& address, std::queue<sim_time_type>& copy);
 	private:
 		void transfer_read_data_from_chip(ChipBookKeepingEntry* chipBKE, DieBookKeepingEntry* dieBKE, NVM_Transaction_Flash* tr);
 		void perform_interleaved_cmd_data_transfer(NVM::FlashMemory::Flash_Chip* chip, DieBookKeepingEntry* bookKeepingEntry);
@@ -119,6 +127,9 @@ namespace SSD_Components
 		ChipBookKeepingEntry** bookKeepingTable;
 		Flash_Transaction_Queue *WaitingReadTX, *WaitingGCRead_TX, *WaitingMappingRead_TX;
 		std::list<DieBookKeepingEntry*> *WaitingCopybackWrites;
+		std::list<sim_time_type>** plane_recently_serviced_usr_time;
+		const size_t max_size = 9;
+		void register_usr_transaction(NVM_Transaction_Flash* tr);
 	};
 }
 

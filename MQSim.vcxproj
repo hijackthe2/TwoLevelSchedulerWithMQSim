@@ -69,10 +69,21 @@
     <ClCompile Include="src\ssd\ONFI_Channel_Base.cpp" />
     <ClCompile Include="src\ssd\ONFI_Channel_NVDDR2.cpp" />
     <ClCompile Include="src\ssd\Queue_Probe.cpp" />
+    <ClCompile Include="src\ssd\TSU_ChipLevelBuffer.cpp" />
+    <ClCompile Include="src\ssd\TSU_CLBFIFO.cpp" />
+    <ClCompile Include="src\ssd\TSU_CLBFLIN.cpp" />
+    <ClCompile Include="src\ssd\TSU_FuzzyFLIN.cpp" />
+    <ClCompile Include="src\ssd\TSU_NPFLIN.cpp" />
+    <ClCompile Include="src\ssd\TSU_SimpleFLIN.cpp" />
+    <ClCompile Include="src\ssd\TSU_SLFFIFO.cpp" />
+    <ClCompile Include="src\ssd\TSU_SLFFLIN.cpp" />
+    <ClCompile Include="src\ssd\TSU_SLFIFO.cpp" />
     <ClCompile Include="src\ssd\Stats.cpp" />
     <ClCompile Include="src\ssd\TSU_Base.cpp" />
     <ClCompile Include="src\ssd\TSU_FLIN.cpp" />
     <ClCompile Include="src\ssd\TSU_OutofOrder.cpp" />
+    <ClCompile Include="src\ssd\TSU_SLFLIN.cpp" />
+    <ClCompile Include="src\ssd\TSU_SLUnit.cpp" />
     <ClCompile Include="src\ssd\TSU_SpeedLimit.cpp" />
     <ClCompile Include="src\ssd\User_Request.cpp" />
     <ClCompile Include="src\utils\CMRRandomGenerator.cpp" />
@@ -153,11 +164,22 @@
     <ClInclude Include="src\ssd\ONFI_Channel_Base.h" />
     <ClInclude Include="src\ssd\ONFI_Channel_NVDDR2.h" />
     <ClInclude Include="src\ssd\Queue_Probe.h" />
+    <ClInclude Include="src\ssd\TSU_ChipLevelBuffer.h" />
+    <ClInclude Include="src\ssd\TSU_CLBFIFO.h" />
+    <ClInclude Include="src\ssd\TSU_CLBFLIN.h" />
+    <ClInclude Include="src\ssd\TSU_FuzzyFLIN.h" />
+    <ClInclude Include="src\ssd\TSU_NPFLIN.h" />
+    <ClInclude Include="src\ssd\TSU_SimpleFLIN.h" />
+    <ClInclude Include="src\ssd\TSU_SLFFIFO.h" />
+    <ClInclude Include="src\ssd\TSU_SLFFLIN.h" />
+    <ClInclude Include="src\ssd\TSU_SLFIFO.h" />
     <ClInclude Include="src\ssd\SSD_Defs.h" />
     <ClInclude Include="src\ssd\Stats.h" />
     <ClInclude Include="src\ssd\TSU_Base.h" />
     <ClInclude Include="src\ssd\TSU_FLIN.h" />
     <ClInclude Include="src\ssd\TSU_OutofOrder.h" />
+    <ClInclude Include="src\ssd\TSU_SLFLIN.h" />
+    <ClInclude Include="src\ssd\TSU_SLUnit.h" />
     <ClInclude Include="src\ssd\TSU_SpeedLimit.h" />
     <ClInclude Include="src\ssd\User_Request.h" />
     <ClInclude Include="src\utils\CMRRandomGenerator.h" />
@@ -174,8 +196,9 @@
     <ClInclude Include="src\utils\XMLWriter.h" />
   </ItemGroup>
   <ItemGroup>
-    <None Include=".gitignore" />
     <None Include="README.md" />
+    <None Include="src\ml_module\model.pyx" />
+    <None Include="src\ml_module\setup.py" />
   </ItemGroup>
   <ItemGroup>
     <Xml Include="ssdconfig.xml" />
@@ -223,15 +246,19 @@
   </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="PropertySheet.props" />
   </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="PropertySheet.props" />
   </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="PropertySheet.props" />
   </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="PropertySheet.props" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">

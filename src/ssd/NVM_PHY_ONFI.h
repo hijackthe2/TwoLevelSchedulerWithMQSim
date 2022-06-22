@@ -11,7 +11,6 @@
 #include "NVM_PHY_Base.h"
 #include "ONFI_Channel_Base.h"
 
-
 namespace SSD_Components
 {
 	enum class ChipStatus { IDLE, CMD_IN, CMD_DATA_IN, DATA_OUT, READING, WRITING, ERASING, WAIT_FOR_DATA_OUT, WAIT_FOR_COPYBACK_CMD };
@@ -22,7 +21,7 @@ namespace SSD_Components
 			unsigned int ChannelCount, unsigned int chip_no_per_channel, unsigned int DieNoPerChip, unsigned int PlaneNoPerDie)
 			: NVM_PHY_Base(id),
 			channel_count(ChannelCount), chip_no_per_channel(chip_no_per_channel), die_no_per_chip(DieNoPerChip), plane_no_per_die(PlaneNoPerDie){}
-		~NVM_PHY_ONFI() {};
+		virtual ~NVM_PHY_ONFI() {};
 
 
 		virtual BusChannelStatus Get_channel_status(flash_channel_ID_type) = 0;

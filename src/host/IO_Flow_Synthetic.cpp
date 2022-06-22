@@ -2,6 +2,8 @@
 #include <stdexcept>
 #include "../sim/Engine.h"
 #include "IO_Flow_Synthetic.h"
+#include <random>
+#include <algorithm>
 
 namespace Host_Components
 {
@@ -13,14 +15,22 @@ namespace Host_Components
 		Utils::Request_Generator_Type generator_type, sim_time_type Average_inter_arrival_time_nano_sec, unsigned int average_number_of_enqueued_requests,
 		bool generate_aligned_addresses, unsigned int alignment_value,
 		int seed, sim_time_type stop_time, double initial_occupancy_ratio, unsigned int total_req_count, HostInterface_Types SSD_device_type, PCIe_Root_Complex* pcie_root_complex, SATA_HBA* sata_hba,
-		bool enabled_logging, sim_time_type logging_period, std::string logging_file_path) :
-		IO_Flow_Base(name, flow_id, start_lsa_on_device, LHA_type(start_lsa_on_device + (end_lsa_on_device - start_lsa_on_device) * working_set_ratio), io_queue_id, nvme_submission_queue_size, nvme_completion_queue_size, priority_class, stop_time, initial_occupancy_ratio, total_req_count, SSD_device_type, pcie_root_complex, sata_hba, enabled_logging, logging_period, logging_file_path),
+		bool enabled_logging, sim_time_type logging_period, std::string logging_file_path, unsigned int flow_cnt) :
+		IO_Flow_Base(name, flow_id, start_lsa_on_device, LHA_type(start_lsa_on_device + (end_lsa_on_device - start_lsa_on_device) * working_set_ratio), io_queue_id, nvme_submission_queue_size, nvme_completion_queue_size, priority_class, stop_time, initial_occupancy_ratio, total_req_count, SSD_device_type, pcie_root_complex, sata_hba, enabled_logging, logging_period, logging_file_path, flow_cnt),
 		read_ratio(read_ratio), address_distribution(address_distribution),
 		working_set_ratio(working_set_ratio), hot_region_ratio(hot_region_ratio),
 		request_size_distribution(request_size_distribution), average_request_size(average_request_size), variance_request_size(variance_request_size),
 		generator_type(generator_type), Average_inter_arrival_time_nano_sec(Average_inter_arrival_time_nano_sec), average_number_of_enqueued_requests(average_number_of_enqueued_requests),
 		seed(seed), generate_aligned_addresses(generate_aligned_addresses), alignment_value(alignment_value)
 	{
+		std::vector<int> random_vector;
+		int randomness = 50;
+		for (int i = 0; i < 100; i++) random_vector.emplace_back(i);
+		std::random_device rd;
+		std::mt19937 g(rd());
+		std::shuffle(random_vector.begin(), random_vector.end(), g);
+		for (int i = 0; i < randomness; ++i) random_set.insert(random_vector[i]);
+
 		if (read_ratio == 0.0)//If read ratio is 0, then we change its value to a negative one so that in request generation we never generate a read request
 			read_ratio = -1.0;
 		random_request_type_generator_seed = seed++;
@@ -30,6 +40,11 @@ namespace Host_Components
 		if (this->start_lsa_on_device > this->end_lsa_on_device)
 			throw std::logic_error("Problem in IO Flow Synthetic, the start LBA address is greater than the end LBA address");
 
+		/*if (flow_count == 2 && flow_id == 1)
+		{
+			this->end_lsa_on_device = this->start_lsa_on_device + (1 << 11) - 1;
+		}*/
+
 		if (address_distribution == Utils::Address_Distribution_Type::RANDOM_HOTCOLD)
 		{
 			random_hot_address_generator_seed = seed++;
@@ -38,6 +53,7 @@ namespace Host_Components
 			random_hot_cold_generator = new Utils::RandomGenerator(random_hot_cold_generator_seed);
 			hot_region_end_lsa = this->start_lsa_on_device + (LHA_type)((double)(this->end_lsa_on_device - this->start_lsa_on_device) * hot_region_ratio);
 		}
+		
 		if (request_size_distribution == Utils::Request_Size_Distribution_Type::NORMAL)
 		{
 			random_request_size_generator_seed = seed++;
@@ -84,7 +100,7 @@ namespace Host_Components
 			request->Type = Host_IO_Request_Type::WRITE;
 			STAT_generated_write_request_count++;
 		}
-
+		
 		switch (request_size_distribution)
 		{
 		case Utils::Request_Size_Distribution_Type::FIXED:
@@ -101,7 +117,7 @@ namespace Host_Components
 		default:
 			throw std::invalid_argument("Uknown distribution type for requset size.");
 		}
-
+		
 		switch (address_distribution)
 		{
 		case Utils::Address_Distribution_Type::STREAMING:
@@ -134,12 +150,44 @@ namespace Host_Components
 			}
 			break;
 		case Utils::Address_Distribution_Type::RANDOM_UNIFORM:
-			request->Start_LBA = random_address_generator->Uniform_ulong(start_lsa_on_device, end_lsa_on_device);
+		{
+			//if (random_set.count((int)(Simulator->Time() / (double)stop_time * 100)))
+			if (Simulator->Time() >= (1 - 0.5) * stop_time)
+			{
+				// random
+				request->Start_LBA = random_address_generator->Uniform_ulong(start_lsa_on_device, end_lsa_on_device);
+				if (request->Start_LBA < start_lsa_on_device || request->Start_LBA > end_lsa_on_device)
+					PRINT_ERROR("Out of range address is generated in IO_Flow_Synthetic!\n")
+				if (request->Start_LBA + request->LBA_count > end_lsa_on_device)
+					request->Start_LBA = start_lsa_on_device;
+			}
+			else
+			{
+				// streaming
+				request->Start_LBA = streaming_next_address;
+				if (request->Start_LBA + request->LBA_count > end_lsa_on_device)
+					request->Start_LBA = start_lsa_on_device;
+				streaming_next_address += request->LBA_count;
+				if (streaming_next_address > end_lsa_on_device)
+					streaming_next_address = start_lsa_on_device;
+				if (generate_aligned_addresses)
+					if (streaming_next_address % alignment_value != 0)
+						streaming_next_address += alignment_value - (streaming_next_address % alignment_value);
+				if (streaming_next_address == request->Start_LBA)
+					PRINT_MESSAGE("Synthetic Message Generator: The same address is always repeated due to configuration parameters!")
+			}
+
+			/*request->Start_LBA = random_address_generator->Uniform_ulong(start_lsa_on_device, end_lsa_on_device);
 			if (request->Start_LBA < start_lsa_on_device || request->Start_LBA > end_lsa_on_device)
+			{
 				PRINT_ERROR("Out of range address is generated in IO_Flow_Synthetic!\n")
+			}
 			if (request->Start_LBA + request->LBA_count > end_lsa_on_device)
-				request->Start_LBA = start_lsa_on_device;
+				request->Start_LBA = start_lsa_on_device;*/
 			break;
+		}
+		/*case Utils::Address_Distribution_Type::MIXED_STREAMING_RANDOM:
+			break;*/
 		default:
 			PRINT_ERROR("Unknown address distribution type!\n")
 		}

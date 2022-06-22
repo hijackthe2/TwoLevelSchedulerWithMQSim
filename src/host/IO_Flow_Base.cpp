@@ -3,6 +3,8 @@
 #include "../sim/Engine.h"
 #include "../exec/Host_System.h"
 
+#include <fstream>
+
 namespace Host_Components
 {
 	//unsigned int InputStreamBase::lastId = 0;
@@ -10,7 +12,7 @@ namespace Host_Components
 		uint16_t nvme_submission_queue_size, uint16_t nvme_completion_queue_size, 
 		IO_Flow_Priority_Class priority_class, sim_time_type stop_time, double initial_occupancy_ratio, unsigned int total_requets_to_be_generated,
 		HostInterface_Types SSD_device_type, PCIe_Root_Complex* pcie_root_complex, SATA_HBA* sata_hba,
-		bool enabled_logging, sim_time_type logging_period, std::string logging_file_path) : 
+		bool enabled_logging, sim_time_type logging_period, std::string logging_file_path, unsigned int flow_cnt) : 
 		MQSimEngine::Sim_Object(name), flow_id(flow_id), start_lsa_on_device(start_lsa_on_device), end_lsa_on_device(end_lsa_on_device), io_queue_id(io_queue_id),
 		priority_class(priority_class), stop_time(stop_time), initial_occupancy_ratio(initial_occupancy_ratio), total_requests_to_be_generated(total_requets_to_be_generated), SSD_device_type(SSD_device_type), pcie_root_complex(pcie_root_complex), sata_hba(sata_hba),
 		STAT_generated_request_count(0), STAT_generated_read_request_count(0), STAT_generated_write_request_count(0),
@@ -23,7 +25,7 @@ namespace Host_Components
 		STAT_min_request_delay(MAXIMUM_TIME), STAT_min_request_delay_read(MAXIMUM_TIME), STAT_min_request_delay_write(MAXIMUM_TIME),
 		STAT_max_request_delay(0), STAT_max_request_delay_read(0), STAT_max_request_delay_write(0),
 		STAT_transferred_bytes_total(0), STAT_transferred_bytes_read(0), STAT_transferred_bytes_write(0), progress(0), next_progress_step(0),
-		enabled_logging(enabled_logging), logging_period(logging_period), logging_file_path(logging_file_path)
+		enabled_logging(enabled_logging), logging_period(logging_period), logging_file_path(logging_file_path), flow_count(flow_cnt)
 	{
 		Host_IO_Reqeust* t= NULL;
 
@@ -213,7 +215,8 @@ namespace Host_Components
 				else progress_bar += " ";
 			}
 			progress_bar += "] ";
-			PRINT_MESSAGE(progress_bar << " " << progress << "% progress in " << ID() << std::endl)
+			PRINT_MESSAGE(progress_bar << " " << progress << "% progress in " << ID() << "\t"
+				<< Simulator->Time() << "\t" << Simulator->Time() / 1.44e13 << std::endl)
 				next_progress_step += 5;
 		}
 
@@ -311,6 +314,9 @@ namespace Host_Components
 
 		delete cqe;
 
+		if (STAT_serviced_request_count >= 1e5) progress = 100;
+
+
 		//Announce simulation progress
 		if (stop_time > 0)
 		{
@@ -332,7 +338,8 @@ namespace Host_Components
 				else progress_bar += " ";
 			}
 			progress_bar += "] ";
-			PRINT_MESSAGE(progress_bar << " " << progress << "% progress in " << ID() << std::endl)
+			PRINT_MESSAGE(progress_bar << " " << progress << "% progress in " << ID() << "\t"
+				<< Simulator->Time() << "\t" << Simulator->Time() / 1.44e13 << std::endl)
 			next_progress_step += 5;
 		}
 
@@ -344,7 +351,25 @@ namespace Host_Components
 			STAT_serviced_request_count_short_term = 0;
 			next_logging_milestone = Simulator->Time() + logging_period;
 		}
-
+		/*4h 1.44e13
+		3h 1.08e13*/
+		// 3151312571434
+		if (
+			(STAT_serviced_request_count >= 86993 && ID().compare("Host.IO_Flow.Trace.traces/snia/cheetah.trace") == 0)
+			//||
+			//(STAT_serviced_request_count >= 518115 && ID().compare("Host.IO_Flow.Trace.traces/snia/tpcc1-0348pm.trace") == 0)
+			)
+		{
+			Simulator->Stop_simulation();
+			std::cout << "Stopped by MQSim with digit\t" << ID() << "\n";
+			return;
+		}
+		//if (Simulator->Time() >= 5868623845474) // 17477751432628 19889782005125 21863012091
+		//{
+		//	Simulator->Stop_simulation();
+		//	std::cout << "Stopped by MQSim with time\n";
+		//	return;
+		//}
 		if (is_done())
 		{
 			((Host_System*)Simulator->GetObject("Host"))->decide_whether_to_stop_engine();

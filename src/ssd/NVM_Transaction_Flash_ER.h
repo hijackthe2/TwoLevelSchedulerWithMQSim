@@ -13,6 +13,9 @@ namespace SSD_Components
 	public:
 		NVM_Transaction_Flash_ER(Transaction_Source_Type source, stream_id_type streamID, const NVM::FlashMemory::Physical_Page_Address& address);
 		std::list<NVM_Transaction_Flash_WR *> Page_movement_activities;
+		unsigned int issued_gc_read_write_count = 0;
+		unsigned int conflict_with_gc_read_count = 0, conflict_with_gc_write_count = 0, conflict_with_gc_erase_count;
+		bool conflict_with_others = false;
 	};
 }
 

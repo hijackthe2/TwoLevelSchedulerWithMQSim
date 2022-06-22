@@ -1,5 +1,6 @@
 #include "Helper_Functions.h"
 #include <cmath>
+#include <float.h>
 
 namespace Utils
 {
@@ -44,7 +45,7 @@ namespace Utils
 
 		double t = h;
 		int itr = 0;
-		double diff = 100000000000000;
+		double diff = DBL_MAX;
 		while (itr < itr_max && diff > max_diff)
 		{
 			double sigma = 0;

@@ -16,10 +16,12 @@ namespace SSD_Components {
 		WaitingMappingRead_TX = new Flash_Transaction_Queue[channel_count];
 		WaitingCopybackWrites = new std::list<DieBookKeepingEntry*>[channel_count];
 		bookKeepingTable = new ChipBookKeepingEntry*[channel_count];
+		plane_recently_serviced_usr_time = new std::list<sim_time_type>*[channel_count];
 		for (unsigned int channelID = 0; channelID < channel_count; channelID++) {
 			bookKeepingTable[channelID] = new ChipBookKeepingEntry[chip_no_per_channel];
+			plane_recently_serviced_usr_time[channelID] = new std::list<sim_time_type>[chip_no_per_channel];
 			for (unsigned int chipID = 0; chipID < chip_no_per_channel; chipID++) {
-				bookKeepingTable[channelID][chipID].Expected_command_exec_finish_time = T0; 
+				bookKeepingTable[channelID][chipID].Expected_command_exec_finish_time = T0;
 				bookKeepingTable[channelID][chipID].Last_transfer_finish_time = T0;
 				bookKeepingTable[channelID][chipID].Die_book_keeping_records = new DieBookKeepingEntry[DieNoPerChip];
 				bookKeepingTable[channelID][chipID].Status = ChipStatus::IDLE;
@@ -40,6 +42,21 @@ namespace SSD_Components {
 			}
 		}
 		_my_instance = this;
+	}
+
+	NVM_PHY_ONFI_NVDDR2::~NVM_PHY_ONFI_NVDDR2()
+	{
+		for (unsigned int channel_id = 0; channel_id < channel_count; ++channel_id)
+		{
+			for (unsigned int chip_id = 0; chip_id < chip_no_per_channel; ++chip_id)
+			{
+				delete[] bookKeepingTable[channel_id][chip_id].Die_book_keeping_records;
+			}
+			delete[] bookKeepingTable[channel_id];
+			delete[] plane_recently_serviced_usr_time[channel_id];
+		}
+		delete[] bookKeepingTable;
+		delete[] plane_recently_serviced_usr_time;
 	}
 
 	void NVM_PHY_ONFI_NVDDR2::Setup_triggers()
@@ -94,6 +111,11 @@ namespace SSD_Components {
 		return NVDDR2DataInTransferTime(transaction->Data_and_metadata_size_in_byte, channels[transaction->Address.ChannelID]);
 	}
 
+	sim_time_type NVM_PHY_ONFI_NVDDR2::Expected_transfer_time(unsigned int metadata_size_in_byte, flash_channel_ID_type channel_id)
+	{
+		return NVDDR2DataInTransferTime(metadata_size_in_byte, channels[channel_id]);
+	}
+
 	sim_time_type NVM_PHY_ONFI_NVDDR2::Expected_command_time(NVM_Transaction_Flash* transaction)
 	{
 		NVM::FlashMemory::Flash_Chip* targetChip = channels[transaction->Address.ChannelID]->Chips[transaction->Address.ChipID];
@@ -113,6 +135,18 @@ namespace SSD_Components {
 		return NULL;
 	}
 
+	bool NVM_PHY_ONFI_NVDDR2::Is_chip_busy_with_gc(flash_channel_ID_type channel_id, flash_chip_ID_type chip_id,
+		flash_block_ID_type die_id, flash_plane_ID_type plane_id)
+	{
+		ChipBookKeepingEntry* chipBKE = &bookKeepingTable[channel_id][chip_id];
+		for (auto& tr : chipBKE->Die_book_keeping_records[die_id].ActiveTransactions)
+		{
+			if (tr->Address.PlaneID == plane_id && tr->Source == Transaction_Source_Type::GC_WL)
+				return true;
+		}
+		return false;
+	}
+
 	bool NVM_PHY_ONFI_NVDDR2::Is_chip_busy_with_gc(flash_channel_ID_type channel_id, flash_chip_ID_type chip_id)
 	{
 		ChipBookKeepingEntry* chipBKE = &bookKeepingTable[channel_id][chip_id];
@@ -130,6 +164,43 @@ namespace SSD_Components {
 	{
 		ChipBookKeepingEntry* chipBKE = &bookKeepingTable[transaction->Address.ChannelID][transaction->Address.ChipID];
 		return (chipBKE->Status != ChipStatus::IDLE);
+	}
+
+	bool NVM_PHY_ONFI_NVDDR2::Is_chip_busy(flash_channel_ID_type channel_id, flash_chip_ID_type chip_id)
+	{
+		return bookKeepingTable[channel_id][chip_id].Status != ChipStatus::IDLE;
+	}
+
+	void NVM_PHY_ONFI_NVDDR2::test_transaction_for_conflicting_with_gc(NVM_Transaction_Flash* transaction)
+	{
+		ChipBookKeepingEntry* chipBKE = &bookKeepingTable[transaction->Address.ChannelID][transaction->Address.ChipID];
+		for (unsigned int die_id = 0; die_id < die_no_per_chip; ++die_id)
+		{
+			for (auto& tr : chipBKE->Die_book_keeping_records[die_id].ActiveTransactions)
+			{
+				if (tr->Source == Transaction_Source_Type::GC_WL)
+				{
+					switch (tr->Type)
+					{
+					case Transaction_Type::READ:
+						((NVM_Transaction_Flash_RD*)tr)->RelatedWrite->RelatedErase->conflict_with_gc_read_count++;
+						((NVM_Transaction_Flash_RD*)tr)->RelatedWrite->RelatedErase->conflict_with_others = tr->Stream_id != transaction->Stream_id;
+						break;
+					case Transaction_Type::WRITE:
+						((NVM_Transaction_Flash_WR*)tr)->RelatedErase->conflict_with_gc_write_count++;
+						((NVM_Transaction_Flash_WR*)tr)->RelatedErase->conflict_with_others = tr->Stream_id != transaction->Stream_id;
+						break;
+					case Transaction_Type::ERASE:
+						((NVM_Transaction_Flash_ER*)tr)->conflict_with_gc_erase_count++;
+						((NVM_Transaction_Flash_ER*)tr)->conflict_with_others = tr->Stream_id != transaction->Stream_id;
+						break;
+					default:
+						break;
+					}
+					transaction->is_conflicting_gc = true;
+				}
+			}
+		}
 	}
 
 	void NVM_PHY_ONFI_NVDDR2::Change_flash_page_status_for_preconditioning(const NVM::FlashMemory::Physical_Page_Address& page_address, const LPA_type lpa)
@@ -186,6 +257,7 @@ namespace SSD_Components {
 			NVM::FlashMemory::PageMetadata metadata;
 			metadata.LPA = (*it)->LPA;
 			dieBKE->ActiveCommand->Meta_data.push_back(metadata);
+			register_usr_transaction(*it);
 		}
 
 		switch (transaction_list.front()->Type)
@@ -736,6 +808,29 @@ namespace SSD_Components {
 				break;
 			}
 
+		}
+	}
+	void NVM_PHY_ONFI_NVDDR2::register_usr_transaction(NVM_Transaction_Flash* transaction)
+	{
+		if (transaction->Source != Transaction_Source_Type::USERIO && transaction->Source != Transaction_Source_Type::CACHE)
+			return;
+		flash_channel_ID_type channel_id = transaction->Address.ChannelID;
+		flash_chip_ID_type chip_id = transaction->Address.ChipID;
+		if (!plane_recently_serviced_usr_time[channel_id][chip_id].empty()
+			&& plane_recently_serviced_usr_time[channel_id][chip_id].back() == Simulator->Time())
+			return;
+		if (plane_recently_serviced_usr_time[channel_id][chip_id].size() == max_size)
+		{
+			plane_recently_serviced_usr_time[channel_id][chip_id].pop_front();
+		}
+		plane_recently_serviced_usr_time[channel_id][chip_id].emplace_back(Simulator->Time());
+	}
+	void NVM_PHY_ONFI_NVDDR2::Get_plane_recently_serviced_usr_time(const NVM::FlashMemory::Physical_Page_Address& address,
+		std::queue<sim_time_type>& copy)
+	{
+		for (auto tr : plane_recently_serviced_usr_time[address.ChannelID][address.ChipID])
+		{
+			copy.emplace(tr);
 		}
 	}
 }

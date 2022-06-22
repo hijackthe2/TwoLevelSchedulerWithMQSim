@@ -49,12 +49,17 @@ namespace SSD_Components
 		~TSU_FLIN();
 		void Prepare_for_transaction_submit();
 		void Submit_transaction(NVM_Transaction_Flash* transaction);
-		void Schedule();
+		void Schedule0();
 
 		void Start_simulation();
 		void Validate_simulation_config();
 		void Execute_simulator_event(MQSimEngine::Sim_Event*);
 		void Report_results_in_XML(std::string name_prefix, Utils::XmlWriter& xmlwriter);
+		size_t GCTRQueueSize(flash_channel_ID_type channel_id, flash_chip_ID_type chip_id);
+		size_t UserTRQueueSize(stream_id_type gc_stream_id, flash_channel_ID_type channel_id, flash_chip_ID_type chip_id);
+		size_t UserTRQueueSize(flash_channel_ID_type channel_id, flash_chip_ID_type chip_id);
+		void handle_transaction_serviced_signal(NVM_Transaction_Flash* transaction) {}
+		void queue_insertion(NVM_Transaction_Flash* transaction) {}
 	private:
 		unsigned int* stream_count_per_priority_class;
 		stream_id_type** stream_ids_per_priority_class;
@@ -88,11 +93,20 @@ namespace SSD_Components
 			double& pw_read, double& pw_write, unsigned int GCM, flash_channel_ID_type channel_id, flash_chip_ID_type chip_id);
 		NVM_Transaction_Flash_RD* get_read_slot(flash_channel_ID_type channel_id, flash_chip_ID_type chip_id);
 		NVM_Transaction_Flash_WR* get_write_slot(flash_channel_ID_type channel_id, flash_chip_ID_type chip_id);
+		void estimate_alone_time(NVM_Transaction_Flash* transaction, Flash_Transaction_Queue* queue);
+		void move_alone_time(NVM_Transaction_Flash* forward_transaction, NVM_Transaction_Flash* backward_transaction);
+		void adjust_alone_time(stream_id_type dispatched_stream_id, sim_time_type adjust_time, Transaction_Type type,
+			Transaction_Source_Type source, Flash_Transaction_Queue* queue);
+		bool is_dominated_by_one_stream(Flash_Transaction_Queue* queue);
 
 		bool service_read_transaction(NVM::FlashMemory::Flash_Chip* chip);
 		bool service_write_transaction(NVM::FlashMemory::Flash_Chip* chip);
 		bool service_erase_transaction(NVM::FlashMemory::Flash_Chip* chip);
 		void service_transaction(NVM::FlashMemory::Flash_Chip* chip);
+		void enqueue_transaction_for_speed_limit_type_tsu() {};
+		bool service_read_transaction0(NVM::FlashMemory::Flash_Chip * chip);
+		bool service_write_transaction0(NVM::FlashMemory::Flash_Chip * chip);
+		bool service_erase_transaction0(NVM::FlashMemory::Flash_Chip * chip);
 
 		void initialize_scheduling_turns();
 		std::vector<unsigned int> scheduling_turn_assignments_read, scheduling_turn_assignments_write;

@@ -11,6 +11,14 @@
 #include "utils/DistributionTypes.h"
 #include "exec/Global.h"
 #include "exec/Externer.h"
+// windows
+// #include <io.h>
+// #include <direct.h>
+// linux
+//#include <unistd.h>
+//#include <sys/stat.h>
+//#include <sys/types.h>
+
 
 using namespace std;
 
@@ -40,14 +48,14 @@ void command_line_args(char* argv[], string& input_file_path, string& workload_f
 void read_configuration_parameters(const string ssd_config_file_path, Execution_Parameter_Set* exec_params)
 {
 	ifstream ssd_config_file;
-	ssd_config_file.open(ssd_config_file_path.c_str());//c_strc()返回指针常量
+	ssd_config_file.open(ssd_config_file_path.c_str());
 
 	if (!ssd_config_file) {
 		PRINT_MESSAGE("The specified SSD configuration file does not exist.")
 		PRINT_MESSAGE("Using MQSim's default configuration.")
 		PRINT_MESSAGE("Writing the default configuration parameters to the expected configuration file.")
 
-		Utils::XmlWriter xmlwriter;//c语言读取xml文件
+		Utils::XmlWriter xmlwriter;
 		string tmp;
 		xmlwriter.Open(ssd_config_file_path.c_str());
 		exec_params->XML_serialize(xmlwriter);
@@ -66,7 +74,7 @@ void read_configuration_parameters(const string ssd_config_file_path, Execution_
 			char* temp_string = new char[line.length() + 1];
 			strcpy(temp_string, line.c_str());
 			doc.parse<0>(temp_string);
-			rapidxml::xml_node<> *mqsim_config = doc.first_node("Execution_Parameter_Set");//根节点
+			rapidxml::xml_node<> *mqsim_config = doc.first_node("Execution_Parameter_Set");
 			if (mqsim_config != NULL)
 			{
 				exec_params = new Execution_Parameter_Set;
@@ -101,8 +109,7 @@ std::vector<std::vector<IO_Flow_Parameter_Set*>*>* read_workload_definitions(con
 
 	ifstream workload_defs_file;
 	workload_defs_file.open(workload_defs_file_path.c_str());
-	bool use_default_workloads = true;//默认使用自带的参数，除非达到一定的条件，保证程序的正常使用
-	//输入参数workload_defs_file_path无法打开
+	bool use_default_workloads = true;
 	if (!workload_defs_file) {
 		PRINT_MESSAGE("The specified workload definition file does not exist!");
 		PRINT_MESSAGE("Using MQSim's default workload definitions.");
@@ -153,7 +160,6 @@ std::vector<std::vector<IO_Flow_Parameter_Set*>*>* read_workload_definitions(con
 			}
 		}
 	}
-	//使用默认的参数设置
 	if (use_default_workloads)
 	{
 		std::vector<IO_Flow_Parameter_Set*>* scenario_definition = new std::vector<IO_Flow_Parameter_Set*>;
@@ -272,7 +278,7 @@ void collect_results(SSD_Device& ssd, Host_System& host, const char* output_file
 			<< "\n\t   total requests serviced:  " << IO_flows[stream_id]->Get_serviced_request_count()
 			<< "\n\t   total requests ignored:   " << IO_flows[stream_id]->Get_ignored_request_count() << endl;
 		cout << "\t-- device response time: " << IO_flows[stream_id]->Get_device_response_time() << " (us)"
-			<< "\n\t   end-to-end request delay:" << IO_flows[stream_id]->Get_end_to_end_request_delay() << " (us)" << endl;
+			<< "\n\t   end-to-end request delay: " << IO_flows[stream_id]->Get_end_to_end_request_delay() << " (us)" << endl;
 	}
 	//cin.get();
 }
@@ -287,7 +293,6 @@ void print_help()
 int main(int argc, char* argv[])
 {
 	string ssd_config_file_path, workload_defs_file_path;
-	//ssd_config_file_path和workload_defs_file_path是配置文件。
 	if (argc != 5)
 	{
 		// MQSim expects 2 arguments: 1) the path to the SSD configuration definition file, and 2) the path to the workload definition file
@@ -296,17 +301,37 @@ int main(int argc, char* argv[])
 	}
 
 	command_line_args(argv, ssd_config_file_path, workload_defs_file_path);
-
 	
 	Execution_Parameter_Set* exec_params = new Execution_Parameter_Set;
 	read_configuration_parameters(ssd_config_file_path, exec_params);
 	std::vector<std::vector<IO_Flow_Parameter_Set*>*>* io_scenarios = read_workload_definitions(workload_defs_file_path);
 
-	gc_fs.open("out/gc_info.txt", std::fstream::out);
-	gc_fs << std::fixed << std::setprecision(3);
-	gc_fs << "plane_invalid_page_percent\t" << "plane_valid_page_percent\t" << "plane_free_page_percent\t" << "plane_free_block_percent\t"
-		<< "block_invalid_page_percent\t" << "proportional_slowdown\t" << "has_gc_transaction\t"
-		<< "GC" << endl;
+	// window
+	// if (_access("out", 0) == -1 && _mkdir("out") == -1)
+	// {
+	// 	std::cout << "cannot create dir /out, which contains recorded statistics\n";
+	// }
+
+	//linux
+	/*if (access("out", F_OK) == -1 && mkdir("out", S_IRUSR | S_IWUSR | S_IXUSR | S_IRWXG | S_IRWXO) == -1)
+	{
+		std::cout << "cannot create dir /out, which contains recorded statistics\n";
+	}*/
+
+	/*PyImport_AppendInittab("model", PyInit_model);
+	Py_Initialize();
+	PyImport_ImportModule("model");
+	testing();*/
+
+	// load
+	string mdl, path;
+	//mdl = "rfc", path = "src/ml_module/rfc.joblib"; // Random Forest Classifier
+	//mdl = "lsvc", path = "src/ml_module/lsvc.joblib"; // Linear SVC
+	//mdl = "lr", path = "src/ml_module/lr.joblib"; // Logistic Regression
+	//mdl = "ilsvc", path = "src/ml_module/ilsvc.joblib"; // Incremental Linear SVC
+	//mdl = "ilr", path = "src/ml_module/ilr.joblib"; // Incremental Logistic Regression
+	//gc_classifier = load(mdl.c_str(), path.c_str()); 
+	//gc_classifier = load_knc(21, 130, 46); // KNeighborsClassifier
 
 	int cntr = 1;
 	for (auto io_scen = io_scenarios->begin(); io_scen != io_scenarios->end(); io_scen++, cntr++)
@@ -333,6 +358,7 @@ int main(int argc, char* argv[])
 
 		time_t end_time = time(0);
 		dt = ctime(&end_time);
+		cout << "Simulator stops at " << Simulator->Time() << endl;
 		PRINT_MESSAGE("MQSim finished at " << dt)
 		uint64_t duration = (uint64_t)difftime(end_time, start_time);
 		PRINT_MESSAGE("Total simulation time: " << duration / 3600 << ":" << (duration % 3600) / 60 << ":" << ((duration % 3600) % 60))
@@ -340,9 +366,10 @@ int main(int argc, char* argv[])
 
 		PRINT_MESSAGE("Writing results to output file .......");
 		collect_results(ssd, host, (workload_defs_file_path.substr(0, workload_defs_file_path.find_last_of(".")) + "_scenario_" + std::to_string(cntr) + ".xml").c_str());
+		//if (gc_classifier != NULL) timing_information(gc_classifier);
 	}
-
-	//cin.get();
-	gc_fs.close();
+	// gc_fs.close();
+	//if (gc_classifier != NULL) delete_classifier(gc_classifier);
+	//Py_Finalize();
 	return 0;
 }

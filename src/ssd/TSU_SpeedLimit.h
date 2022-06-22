@@ -1,11 +1,13 @@
 #ifndef TSU_SPEEDLIMIT_H
 #define TSU_SPEEDLIMIT_H
 
-#include <algorithm>
 #include "FTL.h"
 #include "TSU_Base.h"
 #include "NVM_Transaction_Flash.h"
 #include "NVM_PHY_ONFI_NVDDR2.h"
+#include <vector>
+#include <algorithm>
+#include <map>
 
 namespace SSD_Components
 {
@@ -14,23 +16,28 @@ namespace SSD_Components
 	class TSU_SpeedLimit : public TSU_Base
 	{
 	public:
-		TSU_SpeedLimit(const sim_object_id_type& id, FTL* ftl, NVM_PHY_ONFI_NVDDR2* NVMController, unsigned int channel_count,
-			unsigned int chip_count_per_channel, unsigned int die_count_per_chip, unsigned int plane_count_per_die,
-			unsigned int StreamCount, sim_time_type WriteReasonableSuspensionTimeForRead,
-			sim_time_type EraseReasonableSuspensionTimeForRead, sim_time_type EraseReasonableSuspensionTimeForWrite,
+		TSU_SpeedLimit(const sim_object_id_type& id, FTL* ftl, NVM_PHY_ONFI_NVDDR2* NVMController, unsigned int Channel_no, unsigned int chip_no_per_channel,
+			unsigned int DieNoPerChip, unsigned int PlaneNoPerDie, unsigned int StreamCount,
+			sim_time_type WriteReasonableSuspensionTimeForRead,
+			sim_time_type EraseReasonableSuspensionTimeForRead,
+			sim_time_type EraseReasonableSuspensionTimeForWrite,
 			bool EraseSuspensionEnabled, bool ProgramSuspensionEnabled);
 		~TSU_SpeedLimit();
 		void Prepare_for_transaction_submit();
 		void Submit_transaction(NVM_Transaction_Flash* transaction);
-		void handle_transaction_serviced_signal_from_PHY(NVM_Transaction_Flash* transaction);
-		void Schedule();
+		void handle_transaction_serviced_signal(NVM_Transaction_Flash* transaction);
+		void Schedule0();
 
 		void Start_simulation();
 		void Validate_simulation_config();
-		void Execute_simulator_event(MQSimEngine::Sim_Event* event);
-		double proportional_slowdown(stream_id_type gc_stream_id);
-		size_t GCEraseTRQueueSize(flash_channel_ID_type channel_id, flash_chip_ID_type chip_id);
+		void Execute_simulator_event(MQSimEngine::Sim_Event*);
 		void Report_results_in_XML(std::string name_prefix, Utils::XmlWriter& xmlwriter);
+
+		size_t GCTRQueueSize(flash_channel_ID_type channel_id, flash_chip_ID_type chip_id);
+		size_t UserTRQueueSize(stream_id_type gc_stream_id, flash_channel_ID_type channel_id, flash_chip_ID_type chip_id);
+		size_t UserTRQueueSize(flash_channel_ID_type channel_id, flash_chip_ID_type chip_id);
+		void queue_insertion(NVM_Transaction_Flash* transaction) {}
+
 	private:
 		Flash_Transaction_Queue** UserReadTRQueue;
 		Flash_Transaction_Queue** UserWriteTRQueue;
@@ -40,47 +47,29 @@ namespace SSD_Components
 		Flash_Transaction_Queue** MappingReadTRQueue;
 		Flash_Transaction_Queue** MappingWriteTRQueue;
 
-		unsigned int stream_count;
-		unsigned int* user_read_limit_speed;
-		unsigned int* user_write_limit_speed;
-		const unsigned int min_user_read_arrival_count;
-		const unsigned int min_user_write_arrival_count;
-		const unsigned int max_user_read_arrival_count;
-		const unsigned int max_user_write_arrival_count;
-		unsigned int* user_read_arrival_count;
-		unsigned int* user_write_arrival_count;
-		std::vector<stream_id_type> user_read_idx;
-		std::vector<stream_id_type> user_write_idx;
-		unsigned int* UserReadTRCount;
-		unsigned int* UserWriteTRCount;
-		Flash_Transaction_Queue* UserReadTRBuffer;
-		Flash_Transaction_Queue* UserWriteTRBuffer;
-		sim_time_type* shared_total_time;
-		sim_time_type* alone_total_time;
-		unsigned long long* total_count;
-		unsigned long*** remain_read_queue_count;
-		unsigned long*** remain_write_queue_count;
-		void update(unsigned int* arrival_count, unsigned int* limit_speed, unsigned int max_arrival_count,
-			unsigned int middle_arrival_count, unsigned int min_arrival_count, std::vector<stream_id_type>& idx,
-			const unsigned int interval_time, int type);
-		void speed_limit(Flash_Transaction_Queue** UserTRQueue, Flash_Transaction_Queue* UserTRBuffer,
-			unsigned int* UserTRCount, unsigned int* user_limit_speed, std::vector<stream_id_type>& user_idx);
-		void estimate_proportional_wait(NVM_Transaction_Flash_RD* read_slot, NVM_Transaction_Flash_WR* write_slot,
-			double& pw_read, double& pw_write, int GCM, flash_channel_ID_type channel_id, flash_chip_ID_type chip_id);
-		NVM_Transaction_Flash_RD* get_read_slot(flash_channel_ID_type channel_id, flash_chip_ID_type chip_id);
-		NVM_Transaction_Flash_WR* get_write_slot(flash_channel_ID_type channel_id, flash_chip_ID_type chip_id);
-		std::list<std::pair<Transaction_Type, Transaction_Source_Type>>** transaction_waiting_dispatch_slots;
-		unsigned int*** serviced_writes_since_last_GC;
-		const unsigned int GC_FLIN = 1000;
+		Flash_Transaction_Queue*** read_buffer;
+		Flash_Transaction_Queue*** write_buffer;
+		unsigned int*** read_intensity;
+		unsigned int*** write_intensity;
+		unsigned int*** read_recent_serviced;
+		unsigned int*** write_recent_serviced;
+		sim_time_type interval = 10000000;
 
-		void estimate_alone_time(NVM_Transaction_Flash* transaction, unsigned long long remain_count);
+		void estimate_alone_time(NVM_Transaction_Flash* transaction, Flash_Transaction_Queue* queue);
 		void adjust_alone_time(stream_id_type dispatched_stream_id, sim_time_type adjust_time, Transaction_Type type,
-			Transaction_Source_Type source, Flash_Transaction_Queue* queue, Flash_Transaction_Queue* buffer);
+			Transaction_Source_Type source, Flash_Transaction_Queue* queue);
 
 		bool service_read_transaction(NVM::FlashMemory::Flash_Chip* chip);
 		bool service_write_transaction(NVM::FlashMemory::Flash_Chip* chip);
 		bool service_erase_transaction(NVM::FlashMemory::Flash_Chip* chip);
+		// add function
 		void service_transaction(NVM::FlashMemory::Flash_Chip* chip);
+		void enqueue_transaction_for_speed_limit_type_tsu() {};
+
+		void release(Flash_Transaction_Queue* queue, Flash_Transaction_Queue* buffer, unsigned int* intensity);
+		void release(std::list<Flash_Transaction_Queue*>& queue_list, Flash_Transaction_Queue* buffer, unsigned int* intensity);
+		void release(std::list<Flash_Transaction_Queue*>& queue_list, Flash_Transaction_Queue* queue, Flash_Transaction_Queue* buffer,
+			unsigned int* intensity);
 	};
 }
 

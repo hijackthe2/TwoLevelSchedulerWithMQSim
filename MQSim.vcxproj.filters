@@ -28,6 +28,9 @@
     <Filter Include="utils\rapidxml">
       <UniqueIdentifier>{338b4a59-3227-4ff1-be87-2a60c6309aa6}</UniqueIdentifier>
     </Filter>
+    <Filter Include="ml_module">
+      <UniqueIdentifier>{7551cbe4-2195-423c-99f9-24ccd3f559a9}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\main.cpp" />
@@ -212,6 +215,39 @@
       <Filter>host</Filter>
     </ClCompile>
     <ClCompile Include="src\ssd\TSU_SpeedLimit.cpp">
+      <Filter>ssd</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ssd\TSU_SLFIFO.cpp">
+      <Filter>ssd</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ssd\TSU_SLUnit.cpp">
+      <Filter>ssd</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ssd\TSU_SLFLIN.cpp">
+      <Filter>ssd</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ssd\TSU_SimpleFLIN.cpp">
+      <Filter>ssd</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ssd\TSU_SLFFIFO.cpp">
+      <Filter>ssd</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ssd\TSU_SLFFLIN.cpp">
+      <Filter>ssd</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ssd\TSU_NPFLIN.cpp">
+      <Filter>ssd</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ssd\TSU_ChipLevelBuffer.cpp">
+      <Filter>ssd</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ssd\TSU_CLBFIFO.cpp">
+      <Filter>ssd</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ssd\TSU_CLBFLIN.cpp">
+      <Filter>ssd</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ssd\TSU_FuzzyFLIN.cpp">
       <Filter>ssd</Filter>
     </ClCompile>
   </ItemGroup>
@@ -483,10 +519,48 @@
     <ClInclude Include="src\exec\Externer.h">
       <Filter>exec</Filter>
     </ClInclude>
+    <ClInclude Include="src\ssd\TSU_SLFIFO.h">
+      <Filter>ssd</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ssd\TSU_SLUnit.h">
+      <Filter>ssd</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ssd\TSU_SLFLIN.h">
+      <Filter>ssd</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ssd\TSU_SimpleFLIN.h">
+      <Filter>ssd</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ssd\TSU_SLFFIFO.h">
+      <Filter>ssd</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ssd\TSU_SLFFLIN.h">
+      <Filter>ssd</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ssd\TSU_NPFLIN.h">
+      <Filter>ssd</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ssd\TSU_ChipLevelBuffer.h">
+      <Filter>ssd</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ssd\TSU_CLBFIFO.h">
+      <Filter>ssd</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ssd\TSU_CLBFLIN.h">
+      <Filter>ssd</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ssd\TSU_FuzzyFLIN.h">
+      <Filter>ssd</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="README.md" />
-    <None Include=".gitignore" />
+    <None Include="src\ml_module\model.pyx">
+      <Filter>ml_module</Filter>
+    </None>
+    <None Include="src\ml_module\setup.py">
+      <Filter>ml_module</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Xml Include="ssdconfig.xml" />

@@ -26,6 +26,7 @@ namespace SSD_Components
 		void Get_data_mapping_info_for_gc(const stream_id_type stream_id, const LPA_type lpa, PPA_type& ppa, page_status_type& page_state);
 		void Get_translation_mapping_info_for_gc(const stream_id_type stream_id, const MVPN_type mvpn, MPPN_type& mppa, sim_time_type& timestamp);
 		void Allocate_new_page_for_gc(NVM_Transaction_Flash_WR* transaction, bool is_translation_page);
+		void allocate_plane_for_gc_write(NVM_Transaction_Flash_WR* transaction);
 
 		void Store_mapping_table_on_flash_at_start();
 		LPA_type Get_logical_pages_count(stream_id_type stream_id);
@@ -39,6 +40,8 @@ namespace SSD_Components
 		void Remove_barrier_for_accessing_lpa(stream_id_type stream_id, LPA_type lpa);
 		void Remove_barrier_for_accessing_mvpn(stream_id_type stream_id, MVPN_type mpvn);
 		void Start_servicing_writes_for_overfull_plane(const NVM::FlashMemory::Physical_Page_Address plane_address);
+		void translate_lpa_to_ppa_for_write_with_slf(NVM_Transaction_Flash* transaction);
+		void allocate_DP_for_write(NVM_Transaction_Flash* transaction);
 	private:
 		bool query_cmt(NVM_Transaction_Flash* transaction);
 		PPA_type online_create_entry_for_reads(LPA_type lpa, const stream_id_type stream_id, NVM::FlashMemory::Physical_Page_Address& read_address, uint64_t read_sectors_bitmap);

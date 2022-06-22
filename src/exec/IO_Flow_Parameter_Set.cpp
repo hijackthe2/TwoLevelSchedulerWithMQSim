@@ -291,6 +291,9 @@ void IO_Flow_Parameter_Set_Synthetic::XML_serialize(Utils::XmlWriter& xmlwriter)
 	case Utils::Address_Distribution_Type::RANDOM_UNIFORM:
 		val = "RANDOM_UNIFORM";
 		break;
+	case Utils::Address_Distribution_Type::MIXED_STREAMING_RANDOM:
+		val = "MIXED_STREAMING_RANDOM";
+		break;
 	}
 	xmlwriter.Write_attribute_string(attr, val);
 	 
@@ -393,6 +396,8 @@ void IO_Flow_Parameter_Set_Synthetic::XML_deserialize(rapidxml::xml_node<> *node
 					Address_Distribution = Utils::Address_Distribution_Type::RANDOM_HOTCOLD;
 				else if (strcmp(val.c_str(), "RANDOM_UNIFORM") == 0)
 					Address_Distribution = Utils::Address_Distribution_Type::RANDOM_UNIFORM;
+				else if (strcmp(val.c_str(), "MIXED_STREAMING_RANDOM") == 0)
+					Address_Distribution = Utils::Address_Distribution_Type::MIXED_STREAMING_RANDOM;
 				else PRINT_ERROR("Wrong address distribution type for input synthetic flow")
 			}
 			else if (strcmp(param->name(), "Percentage_of_Hot_Region") == 0)

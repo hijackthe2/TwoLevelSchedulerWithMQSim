@@ -238,7 +238,6 @@ namespace SSD_Components
 				while (it != user_request->Transaction_list.end())
 				{
 					NVM_Transaction_Flash_RD* tr = (NVM_Transaction_Flash_RD*)(*it);
-					std::cout << tr->LPA << std::endl;
 					if (per_stream_cache[tr->Stream_id]->Exists(tr->Stream_id, tr->LPA))//Âß¼­µØÖ·´æÔÚcacheÖÐ
 					{
 						page_status_type available_sectors_bitmap = per_stream_cache[tr->Stream_id]->Get_slot(tr->Stream_id, tr->LPA).State_bitmap_of_existing_sectors & tr->read_sectors_bitmap;
@@ -309,7 +308,6 @@ namespace SSD_Components
 		std::list<NVM_Transaction*> writeback_transactions;
 		auto it = user_request->Transaction_list.begin();
 		
-		std::cout << user_request->Start_LBA << std::endl;
 		int queue_id = user_request->Stream_id;
 		if (shared_dram_request_queue)
 			queue_id = 0;
@@ -320,7 +318,6 @@ namespace SSD_Components
 			NVM_Transaction_Flash_WR* tr = (NVM_Transaction_Flash_WR*)(*it);
 			//std::cout << indexnum << std::endl;
 			//indexnum++;
-			std::cout << tr->LPA << std::endl;
 			//std::cout << tr->Stream_id << std::endl;
 			if (per_stream_cache[tr->Stream_id]->Exists(tr->Stream_id, tr->LPA))//If the logical address already exists in the cache
 			{
