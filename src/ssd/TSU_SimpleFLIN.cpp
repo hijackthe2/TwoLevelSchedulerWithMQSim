@@ -151,7 +151,7 @@ namespace SSD_Components
 				}
 			}
 		}
-		Simulator->Register_sim_event(Simulator->Time() + flow_classification_epoch, this, 0, 0);
+		// Simulator->Register_sim_event(Simulator->Time() + flow_classification_epoch, this, 0, 0);
 	}
 
 	void TSU_SimpleFLIN::handle_transaction_serviced_signal(NVM_Transaction_Flash* transaction)

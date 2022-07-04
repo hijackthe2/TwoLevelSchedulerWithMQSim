@@ -152,7 +152,7 @@ namespace Host_Components
 		case Utils::Address_Distribution_Type::RANDOM_UNIFORM:
 		{
 			//if (random_set.count((int)(Simulator->Time() / (double)stop_time * 100)))
-			if (Simulator->Time() >= (1 - 0.5) * stop_time)
+			/*if (Simulator->Time() >= (1 - 0.5) * stop_time)
 			{
 				// random
 				request->Start_LBA = random_address_generator->Uniform_ulong(start_lsa_on_device, end_lsa_on_device);
@@ -175,15 +175,15 @@ namespace Host_Components
 						streaming_next_address += alignment_value - (streaming_next_address % alignment_value);
 				if (streaming_next_address == request->Start_LBA)
 					PRINT_MESSAGE("Synthetic Message Generator: The same address is always repeated due to configuration parameters!")
-			}
+			}*/
 
-			/*request->Start_LBA = random_address_generator->Uniform_ulong(start_lsa_on_device, end_lsa_on_device);
+			request->Start_LBA = random_address_generator->Uniform_ulong(start_lsa_on_device, end_lsa_on_device);
 			if (request->Start_LBA < start_lsa_on_device || request->Start_LBA > end_lsa_on_device)
 			{
 				PRINT_ERROR("Out of range address is generated in IO_Flow_Synthetic!\n")
 			}
 			if (request->Start_LBA + request->LBA_count > end_lsa_on_device)
-				request->Start_LBA = start_lsa_on_device;*/
+				request->Start_LBA = start_lsa_on_device;
 			break;
 		}
 		/*case Utils::Address_Distribution_Type::MIXED_STREAMING_RANDOM:

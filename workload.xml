@@ -4,8 +4,8 @@
     <IO_Flow_Parameter_Set_Synthetic>
       <Priority_Class>HIGH</Priority_Class>
       <Device_Level_Data_Caching_Mode>TURNED_OFF</Device_Level_Data_Caching_Mode>
-      <Channel_IDs>0</Channel_IDs>
-      <Chip_IDs>0,1,2,3,4,5,6,7</Chip_IDs>
+      <Channel_IDs>0,1,2,3,4,5,6,7</Channel_IDs>
+      <Chip_IDs>0,1,2,3</Chip_IDs>
       <Die_IDs>0,1</Die_IDs>
       <Plane_IDs>0,1</Plane_IDs>
       <Initial_Occupancy_Percentage>75</Initial_Occupancy_Percentage>
@@ -20,7 +20,7 @@
       <Average_Request_Size>4</Average_Request_Size>
       <Variance_Request_Size>0</Variance_Request_Size>
       <Seed>798</Seed>
-      <Average_No_of_Reqs_in_Queue>256</Average_No_of_Reqs_in_Queue>
+      <Average_No_of_Reqs_in_Queue>512</Average_No_of_Reqs_in_Queue>
       <Intensity>32768</Intensity>
       <Stop_Time>10000000000</Stop_Time>
       <Total_Requests_To_Generate>0</Total_Requests_To_Generate>
@@ -29,7 +29,7 @@
       <Priority_Class>HIGH</Priority_Class>
       <Device_Level_Data_Caching_Mode>TURNED_OFF</Device_Level_Data_Caching_Mode>
       <Channel_IDs>0</Channel_IDs>
-      <Chip_IDs>0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31</Chip_IDs>
+      <Chip_IDs>0</Chip_IDs>
       <Die_IDs>0,1</Die_IDs>
       <Plane_IDs>0,1</Plane_IDs>
       <Initial_Occupancy_Percentage>75</Initial_Occupancy_Percentage>
@@ -44,18 +44,18 @@
       <Average_Request_Size>4</Average_Request_Size>
       <Variance_Request_Size>0</Variance_Request_Size>
       <Seed>798</Seed>
-      <Average_No_of_Reqs_in_Queue>256</Average_No_of_Reqs_in_Queue>
+      <Average_No_of_Reqs_in_Queue>512</Average_No_of_Reqs_in_Queue>
       <Intensity>32768</Intensity>
       <Stop_Time>10000000000</Stop_Time>
       <Total_Requests_To_Generate>0</Total_Requests_To_Generate>
     </IO_Flow_Parameter_Set_Synthetic>
-  </IO_Scenario>
-  <IO_Scenario>
+  </IO_Scenario-->
+  <!--IO_Scenario>
     <IO_Flow_Parameter_Set_Synthetic>
       <Priority_Class>HIGH</Priority_Class>
       <Device_Level_Data_Caching_Mode>TURNED_OFF</Device_Level_Data_Caching_Mode>
-      <Channel_IDs>0</Channel_IDs>
-      <Chip_IDs>0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31</Chip_IDs>
+      <Channel_IDs>0,1,2,3,4,5,6,7</Channel_IDs>
+      <Chip_IDs>0,1,2,3</Chip_IDs>
       <Die_IDs>0,1</Die_IDs>
       <Plane_IDs>0,1</Plane_IDs>
       <Initial_Occupancy_Percentage>75</Initial_Occupancy_Percentage>
@@ -70,7 +70,7 @@
       <Average_Request_Size>4</Average_Request_Size>
       <Variance_Request_Size>0</Variance_Request_Size>
       <Seed>798</Seed>
-      <Average_No_of_Reqs_in_Queue>256</Average_No_of_Reqs_in_Queue>
+      <Average_No_of_Reqs_in_Queue>512</Average_No_of_Reqs_in_Queue>
       <Intensity>32768</Intensity>
       <Stop_Time>10000000000</Stop_Time>
       <Total_Requests_To_Generate>0</Total_Requests_To_Generate>
@@ -81,7 +81,7 @@
       <Priority_Class>HIGH</Priority_Class>
       <Device_Level_Data_Caching_Mode>TURNED_OFF</Device_Level_Data_Caching_Mode>
       <Channel_IDs>0</Channel_IDs>
-      <Chip_IDs>0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31</Chip_IDs>
+      <Chip_IDs>0</Chip_IDs>
       <Die_IDs>0,1</Die_IDs>
       <Plane_IDs>0,1</Plane_IDs>
       <Initial_Occupancy_Percentage>75</Initial_Occupancy_Percentage>
@@ -96,7 +96,7 @@
       <Average_Request_Size>4</Average_Request_Size>
       <Variance_Request_Size>0</Variance_Request_Size>
       <Seed>798</Seed>
-      <Average_No_of_Reqs_in_Queue>256</Average_No_of_Reqs_in_Queue>
+      <Average_No_of_Reqs_in_Queue>512</Average_No_of_Reqs_in_Queue>
       <Intensity>32768</Intensity>
       <Stop_Time>10000000000</Stop_Time>
       <Total_Requests_To_Generate>0</Total_Requests_To_Generate>

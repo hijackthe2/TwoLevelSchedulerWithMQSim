@@ -364,12 +364,12 @@ namespace Host_Components
 			std::cout << "Stopped by MQSim with digit\t" << ID() << "\n";
 			return;
 		}
-		//if (Simulator->Time() >= 5868623845474) // 17477751432628 19889782005125 21863012091
-		//{
-		//	Simulator->Stop_simulation();
-		//	std::cout << "Stopped by MQSim with time\n";
-		//	return;
-		//}
+		// if (Simulator->Time() >= 2618231365) // 17477751432628 19889782005125 21863012091
+		// {
+		// 	Simulator->Stop_simulation();
+		// 	std::cout << "Stopped by MQSim with time\n";
+		// 	return;
+		// }
 		if (is_done())
 		{
 			((Host_System*)Simulator->GetObject("Host"))->decide_whether_to_stop_engine();
