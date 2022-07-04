@@ -268,3 +268,6 @@ out/*.txt
 *.xml
 !ssdconfig.xml
 !workload.xml
+
+#from mac
+.DS_Store
